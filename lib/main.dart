@@ -20,7 +20,7 @@ late SharedPreferences prefs;
 
 void main() async {
   debugPrint('DEBUG: Starting main() function...');
-  
+
   try {
     debugPrint('DEBUG: Ensuring Flutter widgets binding...');
     WidgetsFlutterBinding.ensureInitialized();
@@ -62,9 +62,11 @@ void main() async {
     try {
       debugPrint('DEBUG: Initializing OneSignal notification service...');
       await OnesignalNotificationService.init();
-      debugPrint('DEBUG: OneSignal notification service initialized successfully');
+      debugPrint(
+          'DEBUG: OneSignal notification service initialized successfully');
     } catch (e, stackTrace) {
-      debugPrint('ERROR: Failed to initialize OneSignal notification service: $e');
+      debugPrint(
+          'ERROR: Failed to initialize OneSignal notification service: $e');
       debugPrint('STACK TRACE: $stackTrace');
       // Continue execution - notifications might not work
     }
@@ -106,7 +108,7 @@ void main() async {
   }
 
   debugPrint('DEBUG: All initialization completed. Running app...');
-  
+
   try {
     runApp(
       DevicePreview(
@@ -127,11 +129,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     debugPrint('DEBUG: Building MyApp widget...');
-    
+
     String? authStatus;
     String? userType;
     String initialRoute = AppPages.initial;
-    
+
     try {
       // Read authentication status
       debugPrint('DEBUG: Reading authentication status from storage...');
@@ -158,7 +160,7 @@ class MyApp extends StatelessWidget {
       // Determine initial route
       debugPrint('DEBUG: Determining initial route...');
       debugPrint('DEBUG: Default initial route = ${AppPages.initial}');
-      
+
       if (authStatus == "loggedIn") {
         if (userType == "customer") {
           initialRoute = Routes.customerNavBarView;
@@ -167,14 +169,15 @@ class MyApp extends StatelessWidget {
           initialRoute = Routes.serviceProviderNavBarView;
           debugPrint('DEBUG: User is logged in as service provider');
         } else {
-          debugPrint('WARNING: Unknown user type: $userType, using default route');
+          debugPrint(
+              'WARNING: Unknown user type: $userType, using default route');
           initialRoute = AppPages.initial;
         }
       } else {
         debugPrint('DEBUG: User is not logged in, using default route');
         initialRoute = AppPages.initial;
       }
-      
+
       debugPrint('DEBUG: Final initialRoute = $initialRoute');
     } catch (e, stackTrace) {
       debugPrint('ERROR: Failed to determine initial route: $e');
@@ -188,20 +191,22 @@ class MyApp extends StatelessWidget {
         designSize: const Size(360, 800),
         builder: (context, child) {
           debugPrint('DEBUG: Building GetMaterialApp...');
-          
+
           try {
             return GetMaterialApp(
               title: 'Victhon',
               debugShowCheckedModeBanner: false,
               theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: AppColor.primaryColor),
+                colorScheme:
+                    ColorScheme.fromSeed(seedColor: AppColor.primaryColor),
                 useMaterial3: true,
               ),
               initialRoute: initialRoute,
               getPages: AppPages.pages,
               builder: (context, child) {
-                debugPrint('DEBUG: Building app with network status overlay...');
-                
+                debugPrint(
+                    'DEBUG: Building app with network status overlay...');
+
                 NetworkService? networkService;
                 try {
                   networkService = Get.find<NetworkService>();
@@ -215,11 +220,14 @@ class MyApp extends StatelessWidget {
                 try {
                   return Obx(
                     () {
-                      final showMessage = networkService?.showRestoredMessage.value ?? false;
-                      final isConnected = networkService?.isConnected.value ?? true;
-                      
-                      debugPrint('DEBUG: Network status - showMessage: $showMessage, isConnected: $isConnected');
-                      
+                      final showMessage =
+                          networkService?.showRestoredMessage.value ?? false;
+                      final isConnected =
+                          networkService?.isConnected.value ?? true;
+
+                      debugPrint(
+                          'DEBUG: Network status - showMessage: $showMessage, isConnected: $isConnected');
+
                       return Stack(
                         children: [
                           child!,
@@ -240,7 +248,8 @@ class MyApp extends StatelessWidget {
                                           !isConnected
                                               ? 'No Internet Connection'
                                               : "Internet Restored",
-                                          style: const TextStyle(color: Colors.white),
+                                          style: const TextStyle(
+                                              color: Colors.white),
                                           textAlign: TextAlign.center,
                                         ),
                                       ),
@@ -253,7 +262,8 @@ class MyApp extends StatelessWidget {
                     },
                   );
                 } catch (e, stackTrace) {
-                  debugPrint('ERROR: Failed to build network status overlay: $e');
+                  debugPrint(
+                      'ERROR: Failed to build network status overlay: $e');
                   debugPrint('STACK TRACE: $stackTrace');
                   // Return child without overlay if there's an error
                   return child!;
@@ -273,7 +283,8 @@ class MyApp extends StatelessWidget {
                     children: [
                       Text(
                         'Failed to initialize app',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8),
                       Text('Please restart the application'),
@@ -288,9 +299,9 @@ class MyApp extends StatelessWidget {
     } catch (e, stackTrace) {
       debugPrint('FATAL ERROR: Failed to build MyApp: $e');
       debugPrint('STACK TRACE: $stackTrace');
-      
+
       // Return absolute minimal fallback
-      return MaterialApp(
+      return const MaterialApp(
         home: Scaffold(
           body: Center(
             child: Text(

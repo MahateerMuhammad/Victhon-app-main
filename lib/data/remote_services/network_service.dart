@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:Victhon/app/customerApp/bookings/controller/bookings_controller.dart';
 import 'package:Victhon/app/customerApp/home/controller/home_controllers.dart';
@@ -19,11 +20,11 @@ class NetworkService extends GetxService {
   late final StreamSubscription<InternetConnectionStatus> _subscription;
 
   Future<NetworkService> init() async {
-    print("---------- Network onInit");
+    debugPrint("---------- Network onInit");
 
     // _checkInitialConnection();
     _subscription = _connectivity.onStatusChange.listen((status) {
-      print("----------- Update status: ${status}");
+      debugPrint("----------- Update status: $status");
       // if(!isConnected.value)
       isConnected.value = status == InternetConnectionStatus.connected;
       if (box.read("authStatus") == "loggedIn") {
@@ -44,14 +45,14 @@ class NetworkService extends GetxService {
         }
       }
 
-      print("Internet status updated: $isConnected");
+      debugPrint("Internet status updated: $isConnected");
     });
 
     return this;
   }
 
   void _onNetworkRestored() {
-    print("Network restored --------------");
+    debugPrint("Network restored --------------");
     // Call all necessary controllers here
     try {
       if (box.read("userType") == "customer") {
@@ -68,7 +69,7 @@ class NetworkService extends GetxService {
 
       // Add other controller refreshes here...
     } catch (e) {
-      print("Error refreshing controllers: $e");
+      debugPrint("Error refreshing controllers: $e");
     }
   }
 

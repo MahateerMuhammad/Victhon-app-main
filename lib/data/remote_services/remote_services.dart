@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import '../../utils/api_list.dart';
 import '../server/app_server.dart';
 
@@ -66,24 +67,28 @@ class RemoteServices {
     required String userType,
   }) async {
     // Use mobile-specific endpoints for Flutter app
-    String endpoint = userType == "customer" 
-        ? ApiList.customerGoogleAuth 
+    String endpoint = userType == "customer"
+        ? ApiList.customerGoogleAuth
         : ApiList.serviceProviderGoogleAuth;
-    
-    print('[DEBUG] GoogleSignUp - userType: $userType');
-    print('[DEBUG] GoogleSignUp - endpoint: $endpoint');
-    print('[DEBUG] GoogleSignUp - idToken length: ${idToken.length}');
-    print('[DEBUG] GoogleSignUp - idToken preview: ${idToken.substring(0, 50)}...');
-    
+
+    debugPrint('[DEBUG] GoogleSignUp - userType: $userType');
+    debugPrint('[DEBUG] GoogleSignUp - endpoint: $endpoint');
+    debugPrint('[DEBUG] GoogleSignUp - idToken length: ${idToken.length}');
+    debugPrint(
+        '[DEBUG] GoogleSignUp - idToken preview: ${idToken.substring(0, 50)}...');
+
     final response = await server.postRequest(
         endPoint: endpoint,
         headers: AppServer.getAuthHeaders(),
         body: {"idToken": idToken});
 
-    print('[DEBUG] GoogleSignUp - Response Status: ${response.statusCode}');
-    print('[DEBUG] GoogleSignUp - Response Success: ${response.isSuccess}');
-    print('[DEBUG] GoogleSignUp - Response Data: ${response.data}');
-    print('[DEBUG] GoogleSignUp - Response Error: ${response.errorMessage}');
+    debugPrint(
+        '[DEBUG] GoogleSignUp - Response Status: ${response.statusCode}');
+    debugPrint(
+        '[DEBUG] GoogleSignUp - Response Success: ${response.isSuccess}');
+    debugPrint('[DEBUG] GoogleSignUp - Response Data: ${response.data}');
+    debugPrint(
+        '[DEBUG] GoogleSignUp - Response Error: ${response.errorMessage}');
 
     return response;
   }
@@ -354,7 +359,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -370,7 +375,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -393,10 +398,10 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("Send message success: $data");
+      debugPrint("Send message success: $data");
       return data;
     } else {
-      print("Send message error: ${response.errorMessage}");
+      debugPrint("Send message error: ${response.errorMessage}");
       return response;
     }
   }
@@ -409,10 +414,10 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("Conversation messages: $data");
+      debugPrint("Conversation messages: $data");
       return data;
     } else {
-      print("Get messages error: ${response.errorMessage}");
+      debugPrint("Get messages error: ${response.errorMessage}");
       return response;
     }
   }
@@ -425,7 +430,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -440,7 +445,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -462,7 +467,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -477,7 +482,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -493,7 +498,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -509,7 +514,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -525,7 +530,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -545,7 +550,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      // print("object 222222222 $data");
+      // debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -561,7 +566,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      // print("object 222222222 $data");
+      // debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -577,11 +582,11 @@ class RemoteServices {
   //       endPoint: "https://countriesnow.space/api/v0.1/countries/states",
   //       headers: AppServer.getAuthHeaders());
 
-  //   print("zzzzzzzzzzz ${response.data}");
+  //   debugPrint("zzzzzzzzzzz ${response.data}");
 
   //   if (response.isSuccess) {
   //     final data = response.data;
-  //     print("object333333333 $data");
+  //     debugPrint("object333333333 $data");
 
   //     return data;
   //   } else {
@@ -597,9 +602,7 @@ class RemoteServices {
         endPoint: ApiList.sendOneSignalPlayerId,
         headers: AppServer.getHttpHeadersWithToken());
 
-
-      return response;
-
+    return response;
   }
 
   //Notification Preference
@@ -628,7 +631,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -666,7 +669,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      // print("object 222222222 $data");
+      // debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -827,7 +830,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -875,7 +878,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {
@@ -891,7 +894,7 @@ class RemoteServices {
 
     if (response.isSuccess) {
       final data = response.data;
-      print("object 222222222 $data");
+      debugPrint("object 222222222 $data");
 
       return data;
     } else {

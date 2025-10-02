@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import '../../main.dart';
 import '../../utils/api_list.dart';
@@ -14,13 +15,13 @@ void initSocket() {
   );
 
   socket.onConnect((_) {
-    print('############## Connected to socket server ##########');
+    debugPrint('############## Connected to socket server ##########');
   });
 
   socket.onDisconnect((_) {
-    print('Disconnected from socket server');
+    debugPrint('Disconnected from socket server');
   });
 
-  socket.onConnectError((data) => print('Connect error: $data'));
-  socket.onError((data) => print('Socket error: $data'));
+  socket.onConnectError((data) => debugPrint('Connect error: $data'));
+  socket.onError((data) => debugPrint('Socket error: $data'));
 }

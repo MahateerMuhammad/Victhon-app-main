@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:Victhon/data/remote_services/remote_services.dart';
@@ -21,44 +22,46 @@ final GoogleSignIn _googleSignIn = GoogleSignIn(
 Future<void> signInWithGoogle(String userType, String authType) async {
   final authController = Get.put(AuthController());
 
-  print('[DEBUG] signInWithGoogle called with userType: $userType, authType: $authType');
+  debugPrint(
+      '[DEBUG] signInWithGoogle called with userType: $userType, authType: $authType');
   try {
-    print('[DEBUG] Signing out of previous Google session...');
+    debugPrint('[DEBUG] Signing out of previous Google session...');
     await _googleSignIn.signOut(); // optional: force sign-in prompt
-    print('[DEBUG] Prompting user to sign in with Google...');
+    debugPrint('[DEBUG] Prompting user to sign in with Google...');
     final GoogleSignInAccount? account = await _googleSignIn.signIn();
 
     if (account == null) {
-      print('[DEBUG] Google sign-in cancelled by user.');
+      debugPrint('[DEBUG] Google sign-in cancelled by user.');
       return;
     }
 
-    print('[DEBUG] Google account selected: \\${account.email}');
+    debugPrint('[DEBUG] Google account selected: \\${account.email}');
     final GoogleSignInAuthentication auth = await account.authentication;
-    print('[DEBUG] Google accessToken: \\${auth.accessToken}');
-    print('[DEBUG] Google idToken: \\${auth.idToken}');
+    debugPrint('[DEBUG] Google accessToken: \\${auth.accessToken}');
+    debugPrint('[DEBUG] Google idToken: \\${auth.idToken}');
 
     String? idToken = auth.idToken;
 
     if (idToken != null) {
-      print('[DEBUG] Sending idToken to backend for $authType...');
+      debugPrint('[DEBUG] Sending idToken to backend for $authType...');
       authController.isLoading.value = true;
       final ApiResponse response = await RemoteServices()
           .googleSignUp(idToken: idToken, userType: userType);
-      print('[DEBUG] Backend response: $response');
-      print('[DEBUG] Response data: ${response.data}');
-      print('[DEBUG] Response isSuccess: ${response.isSuccess}');
-      print('[DEBUG] Response statusCode: ${response.statusCode}');
+      debugPrint('[DEBUG] Backend response: $response');
+      debugPrint('[DEBUG] Response data: ${response.data}');
+      debugPrint('[DEBUG] Response isSuccess: ${response.isSuccess}');
+      debugPrint('[DEBUG] Response statusCode: ${response.statusCode}');
 
       authController.isLoading.value = false;
 
       if (response.isSuccess) {
         final data = response.data;
-        print('[DEBUG] Login successful: $data');
+        debugPrint('[DEBUG] Login successful: $data');
         box.write('token', data["access_token"]);
 
         if (data["userProfile"] == null) {
-          print('[DEBUG] No userProfile found, redirecting to profile creation.');
+          debugPrint(
+              '[DEBUG] No userProfile found, redirecting to profile creation.');
           customSnackbar("SUCCESS".tr, "SignUp successful!", AppColor.success);
           if (userType == "customer") {
             Get.off(() => CreateProfileScreen(identifier: data["email"]));
@@ -67,7 +70,7 @@ Future<void> signInWithGoogle(String userType, String authType) async {
                 () => ProviderCreateProfileScreen(identifier: data["email"]));
           }
         } else {
-          print('[DEBUG] User profile exists, logging in.');
+          debugPrint('[DEBUG] User profile exists, logging in.');
           box.write("authStatus", "loggedIn");
           box.write("userType", userType);
 
@@ -78,22 +81,23 @@ Future<void> signInWithGoogle(String userType, String authType) async {
           }
         }
       } else if (response.statusCode == 404) {
-        print('[DEBUG] Login failed: 404 Not Found');
+        debugPrint('[DEBUG] Login failed: 404 Not Found');
         if (authType == "signIn") {
           customSnackbar(
               "ERROR".tr, "No account found. Please SignUp", AppColor.error);
         }
       } else {
-        print('[DEBUG] Login failed: $authType failed, please try again later');
+        debugPrint(
+            '[DEBUG] Login failed: $authType failed, please try again later');
         customSnackbar("ERROR".tr, "$authType failed, please try again later",
             AppColor.error);
       }
     } else {
-      print('[DEBUG] idToken is null, failed connection.');
+      debugPrint('[DEBUG] idToken is null, failed connection.');
       customSnackbar("ERROR".tr, "Failed connection", AppColor.error);
     }
   } catch (e) {
-    print('[DEBUG] Exception during Google sign-in: $e');
+    debugPrint('[DEBUG] Exception during Google sign-in: $e');
     Get.snackbar(
       "Message".tr,
       "Poor Internet Connection, retry",

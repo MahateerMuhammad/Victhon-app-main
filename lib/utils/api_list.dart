@@ -1,17 +1,15 @@
-
 class ApiList {
-  static const baseUrl = "http://192.168.18.251:3000";
-  static const String socketUrl = "http://192.168.18.251:3000";
+  static const baseUrl = "http://10.135.133.255:3000";
+  static const String socketUrl = "http://10.135.133.255:3000";
 
   static const login = "$baseUrl/auth/user/login?role=";
   static const customerGoogleAuth = "$baseUrl/auth/google/mobile/customer";
-  static const serviceProviderGoogleAuth = "$baseUrl/auth/google/mobile/provider";
-
+  static const serviceProviderGoogleAuth =
+      "$baseUrl/auth/google/mobile/provider";
 
   static const signUp = "$baseUrl/auth/user/signup/initiate?role=";
   static const signIn = "$baseUrl/auth/user/login?role=";
   static const googleAuth = "$baseUrl/auth/google/";
-
 
   static const forgotPassword = "$baseUrl/auth/ResetPassword/initiate";
   static const resetPassword = "$baseUrl/auth/ResetPassword/validate";
@@ -26,18 +24,19 @@ class ApiList {
   static const profileImage = "$baseUrl/upload/profile-image?role=";
 
   //Notification
-  static const sendOneSignalPlayerId= "$baseUrl/notifications/update/player-id";
+  static const sendOneSignalPlayerId =
+      "$baseUrl/notifications/update/player-id";
   static const notifications = "$baseUrl/notifications";
-  static const createNotifiPreference = "$baseUrl/notification-preferences/create";
-  static const updateNotifiPreference = "$baseUrl/notification-preferences/update";
+  static const createNotifiPreference =
+      "$baseUrl/notification-preferences/create";
+  static const updateNotifiPreference =
+      "$baseUrl/notification-preferences/update";
   static const getNotifiPreference = "$baseUrl/notification-preferences/get";
-
 
   //Services ApiList
   static const getAllServices = "$baseUrl/booking/top-services";
   static const searchServices = "$baseUrl/booking/services/";
   static const providerServices = "$baseUrl/services/provider";
-
 
   static const getTopCategories = "$baseUrl/booking/top-categories";
   static const createServices = "$baseUrl/services/create";
@@ -78,15 +77,8 @@ class ApiList {
   static const addBankAccount = "$baseUrl/banks/acount/add";
   static const deleteBankAccount = "$baseUrl/banks/account/";
 
-
-
-
   //ratings and review
   static const getRatingsAndReviews = "$baseUrl/ratings/serviceProvider";
   static const ratingAndReviewService = "$baseUrl/ratings/booking/";
   static const reportService = "$baseUrl/booking/report";
-
-
-
-  
 }

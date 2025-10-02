@@ -1,6 +1,9 @@
+// ignore_for_file: depend_on_referenced_packages, prefer_collection_literals
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -36,7 +39,7 @@ class AppServer {
     // ✅ Check if connected to the internet
     final hasConnection = await InternetConnectionChecker().hasConnection;
     if (!hasConnection) {
-      print("⚠️ No internet connection");
+      debugPrint("⚠️ No internet connection");
       return ApiResponse(
         statusCode: 0,
         errorMessage: "No internet connection",
@@ -44,8 +47,8 @@ class AppServer {
     }
 
     try {
-      print("----------------- $headers");
-      print("----------------- $endPoint");
+      debugPrint("----------------- $headers");
+      debugPrint("----------------- $endPoint");
 
       final response = await dio
           .get(
@@ -55,29 +58,29 @@ class AppServer {
           )
           .timeout(timeoutDuration);
 
-      print("----------------- ${response.data}");
+      debugPrint("----------------- ${response.data}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        print("got here ---------1");
+        debugPrint("got here ---------1");
         return ApiResponse(
           data: response.data,
           statusCode: response.statusCode,
         );
       } else {
-        print("got here ---------2");
+        debugPrint("got here ---------2");
         return ApiResponse(
           statusCode: response.statusCode,
           errorMessage: "Unexpected Error",
         );
       }
     } on DioException catch (e) {
-      print("got here $e ---------3");
+      debugPrint("got here $e ---------3");
       return ApiResponse(
         statusCode: e.response?.statusCode ?? 500,
         errorMessage: e.response?.data?['message'] ?? 'Something went wrong',
       );
     } catch (e) {
-      print("got here ---------4");
+      debugPrint("got here ---------4");
       return ApiResponse(
         statusCode: 500,
         errorMessage: 'Error: $e',
@@ -92,7 +95,7 @@ class AppServer {
     final dio = Dio();
 
     try {
-      print("----------------- $endPoint");
+      debugPrint("----------------- $endPoint");
       final response = await dio
           .get(
             endPoint,
@@ -102,7 +105,7 @@ class AppServer {
             ),
           )
           .timeout(timeoutDuration);
-      print("----------------- $response");
+      debugPrint("----------------- $response");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         return ApiResponse(
@@ -130,7 +133,7 @@ class AppServer {
 
     final hasConnection = await InternetConnectionChecker().hasConnection;
     if (!hasConnection) {
-      print("⚠️ No internet connection");
+      debugPrint("⚠️ No internet connection");
       customSnackbar("ERROR".tr, "No Internet Connection", AppColor.error);
       return ApiResponse(
         statusCode: 0,
@@ -139,9 +142,9 @@ class AppServer {
     }
 
     try {
-      print("----------------- $headers");
-      print("----------------- $endPoint");
-      print("----------------- $body");
+      debugPrint("----------------- $headers");
+      debugPrint("----------------- $endPoint");
+      debugPrint("----------------- $body");
 
       final response = await dio
           .post(
@@ -151,7 +154,7 @@ class AppServer {
             data: body,
           )
           .timeout(timeoutDuration);
-      // print("Post hereeeeeee ${response}");
+      // debugPrint("Post hereeeeeee ${response}");
       if (response.statusCode == 201 || response.statusCode == 200) {
         return ApiResponse(
             data: response.data, statusCode: response.statusCode);
@@ -160,7 +163,7 @@ class AppServer {
             statusCode: response.statusCode, errorMessage: "Unexpected Error");
       }
     } on DioException catch (e) {
-      print("errrrrrrorrrrr ${e.response?.statusCode}");
+      debugPrint("errrrrrrorrrrr ${e.response?.statusCode}");
       return ApiResponse(
         statusCode: e.response?.statusCode ?? 500,
         errorMessage: e.response?.data?['message'] ?? 'Something went wrong',
@@ -187,8 +190,8 @@ class AppServer {
       var response = await http.Response.fromStream(streamedResponse);
 
       // Print and return response
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
+      debugPrint("Status Code: ${response.statusCode}");
+      debugPrint("Response Body: ${response.body}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         return ApiResponse(
@@ -198,7 +201,7 @@ class AppServer {
             statusCode: response.statusCode, errorMessage: "Unexpected Error");
       }
     } on DioException catch (e) {
-      print("errrrrrrorrrrr ${e.response?.statusCode}");
+      debugPrint("errrrrrrorrrrr ${e.response?.statusCode}");
       return ApiResponse(
         statusCode: e.response?.statusCode ?? 500,
         errorMessage: e.response?.data?['message'] ?? 'Something went wrong',
@@ -251,8 +254,8 @@ class AppServer {
           }
         }
       }
-      print("----------------- ${request.fields}");
-      print("----------File------- ${request.fields}");
+      debugPrint("----------------- ${request.fields}");
+      debugPrint("----------File------- ${request.fields}");
 
       // Send request
       var streamedResponse = await request.send();
@@ -261,8 +264,8 @@ class AppServer {
       var response = await http.Response.fromStream(streamedResponse);
 
       // Print and return response
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
+      debugPrint("Status Code: ${response.statusCode}");
+      debugPrint("Response Body: ${response.body}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         return ApiResponse(
@@ -272,7 +275,7 @@ class AppServer {
             statusCode: response.statusCode, errorMessage: "Unexpected Error");
       }
     } on DioException catch (e) {
-      print("errrrrrrorrrrr ${e.response?.statusCode}");
+      debugPrint("errrrrrrorrrrr ${e.response?.statusCode}");
       return ApiResponse(
         statusCode: e.response?.statusCode ?? 500,
         errorMessage: e.response?.data?['message'] ?? 'Something went wrong',
@@ -311,7 +314,7 @@ class AppServer {
     final dio = Dio();
     final hasConnection = await InternetConnectionChecker().hasConnection;
     if (!hasConnection) {
-      print("⚠️ No internet connection");
+      debugPrint("⚠️ No internet connection");
       customSnackbar("ERROR".tr, "No Internet Connection", AppColor.error);
       return ApiResponse(
         statusCode: 0,
@@ -320,8 +323,8 @@ class AppServer {
     }
 
     try {
-      print("----------------- $headers");
-      print("----------------- $endPoint");
+      debugPrint("----------------- $headers");
+      debugPrint("----------------- $endPoint");
       final response = await dio
           .put(
             endPoint,
@@ -329,7 +332,7 @@ class AppServer {
             data: body,
           )
           .timeout(timeoutDuration);
-      print("----------------- ${response.data}");
+      debugPrint("----------------- ${response.data}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         return ApiResponse(
@@ -351,13 +354,13 @@ class AppServer {
   deleteRequest({required String endPoint, headers}) async {
     final dio = Dio();
     try {
-      print("----------------- $headers");
-      print("----------------- $endPoint");
+      debugPrint("----------------- $headers");
+      debugPrint("----------------- $endPoint");
       final response = await dio.delete(
         endPoint,
         options: Options(headers: headers),
       );
-      print("----------------- ${response.data}");
+      debugPrint("----------------- ${response.data}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         return ApiResponse(
