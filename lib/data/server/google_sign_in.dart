@@ -21,47 +21,44 @@ final GoogleSignIn _googleSignIn = GoogleSignIn(
 Future<void> signInWithGoogle(String userType, String authType) async {
   final authController = Get.put(AuthController());
 
+  print('[DEBUG] signInWithGoogle called with userType: $userType, authType: $authType');
   try {
+    print('[DEBUG] Signing out of previous Google session...');
     await _googleSignIn.signOut(); // optional: force sign-in prompt
+    print('[DEBUG] Prompting user to sign in with Google...');
     final GoogleSignInAccount? account = await _googleSignIn.signIn();
 
     if (account == null) {
-      // User canceled
+      print('[DEBUG] Google sign-in cancelled by user.');
       return;
     }
 
+    print('[DEBUG] Google account selected: \\${account.email}');
     final GoogleSignInAuthentication auth = await account.authentication;
-    print("----------------- ${auth.accessToken}");
-    print("----------------- ${auth.idToken}");
+    print('[DEBUG] Google accessToken: \\${auth.accessToken}');
+    print('[DEBUG] Google idToken: \\${auth.idToken}');
 
     String? idToken = auth.idToken;
-//     while (idToken!.length > 0) {
-//     int initLength = (idToken.length >= 500 ? 500 : idToken.length);
-//     print(idToken.substring(0, initLength));
-//     int endLength = idToken.length;
-//     idToken = idToken.substring(initLength, endLength);
-
-// }
 
     if (idToken != null) {
+      print('[DEBUG] Sending idToken to backend for $authType...');
       authController.isLoading.value = true;
-      // Send idToken to your backend
       final ApiResponse response = await RemoteServices()
           .googleSignUp(idToken: idToken, userType: userType);
-      print('Login successful: ${response}');
-      print('Login : ${response.data}');
-      print('Login : ${response.isSuccess}');
-      print('Login : ${response.statusCode}');
+      print('[DEBUG] Backend response: $response');
+      print('[DEBUG] Response data: ${response.data}');
+      print('[DEBUG] Response isSuccess: ${response.isSuccess}');
+      print('[DEBUG] Response statusCode: ${response.statusCode}');
 
       authController.isLoading.value = false;
 
       if (response.isSuccess) {
         final data = response.data;
-        // ✅ Save auth token or user info if needed
-        print('Login successful: $data');
+        print('[DEBUG] Login successful: $data');
         box.write('token', data["access_token"]);
 
         if (data["userProfile"] == null) {
+          print('[DEBUG] No userProfile found, redirecting to profile creation.');
           customSnackbar("SUCCESS".tr, "SignUp successful!", AppColor.success);
           if (userType == "customer") {
             Get.off(() => CreateProfileScreen(identifier: data["email"]));
@@ -70,6 +67,7 @@ Future<void> signInWithGoogle(String userType, String authType) async {
                 () => ProviderCreateProfileScreen(identifier: data["email"]));
           }
         } else {
+          print('[DEBUG] User profile exists, logging in.');
           box.write("authStatus", "loggedIn");
           box.write("userType", userType);
 
@@ -80,20 +78,22 @@ Future<void> signInWithGoogle(String userType, String authType) async {
           }
         }
       } else if (response.statusCode == 404) {
-        //  print('Login failed: ${response.data}');
+        print('[DEBUG] Login failed: 404 Not Found');
         if (authType == "signIn") {
           customSnackbar(
               "ERROR".tr, "No account found. Please SignUp", AppColor.error);
         }
       } else {
+        print('[DEBUG] Login failed: $authType failed, please try again later');
         customSnackbar("ERROR".tr, "$authType failed, please try again later",
             AppColor.error);
       }
     } else {
+      print('[DEBUG] idToken is null, failed connection.');
       customSnackbar("ERROR".tr, "Failed connection", AppColor.error);
     }
   } catch (e) {
-    // print('Error during Google sign-in: $e');
+    print('[DEBUG] Exception during Google sign-in: $e');
     Get.snackbar(
       "Message".tr,
       "Poor Internet Connection, retry",

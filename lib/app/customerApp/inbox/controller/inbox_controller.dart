@@ -32,31 +32,33 @@ class InboxController extends GetxController {
   }
 
   Future<void> fetchConversation() async {
-    print("heyyyyyyyy fetch conversation");
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    customerMessages.clear();
-    // Check if services exist in local storage
-    String? savedConversationDetails = prefs.getString("cached_conversations");
-
-    if (savedConversationDetails != null) {
-      print("savedConversationDetails: $savedConversationDetails");
-
-      conversationDetails.value =
-          List<Map>.from(json.decode(savedConversationDetails)).toList();
-    }
-    isLoading(true);
-
-    // Fetch new services from API
-    final response = await RemoteServices().getConversation();
-    // print("@@@@@@@@@@ ${response["conversations"]} @@@@@@@@@@");
-    print("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
-    isLoading(false);
-
-    if (response is Map<String, dynamic>) {
-      conversationDetails.value = response["conversations"];
-      await prefs.setString(
-          "cached_conversations", json.encode(response["conversations"]));
-      print("cached_conversations ${prefs.getString("cached_conversations")}");
+    try {
+      print("Fetching conversations...");
+      isLoading(true);
+      
+      // Load cached conversations first for faster UI
+      final prefs = await SharedPreferences.getInstance();
+      final cached = prefs.getString("cached_conversations");
+      if (cached != null && cached != "[]") {
+        conversationDetails.value = List<Map>.from(json.decode(cached));
+        print("Loaded ${conversationDetails.length} cached conversations");
+      }
+      
+      // Fetch fresh data from API in background
+      final response = await RemoteServices().getConversation();
+      
+      if (response is Map<String, dynamic> && response["conversations"] != null) {
+        conversationDetails.value = List<Map>.from(response["conversations"]);
+        
+        // Cache the new data
+        await prefs.setString("cached_conversations", json.encode(response["conversations"]));
+        print("Updated with ${conversationDetails.length} conversations from API");
+      }
+      
+    } catch (e) {
+      print("Error fetching conversations: $e");
+    } finally {
+      isLoading(false);
     }
   }
 
@@ -66,27 +68,99 @@ class InboxController extends GetxController {
     print("messages: $customerMessages");
   }
 
-  sendMessage(
+  void refreshConversationsOnly() {
+    // Only refresh the conversation list without interfering with current chat
+    fetchConversation();
+  }
+
+  Future<void> refreshConversations() async {
+    // Force refresh without loading indicator for pull-to-refresh
+    try {
+      final response = await RemoteServices().getConversation();
+      
+      if (response is Map<String, dynamic> && response["conversations"] != null) {
+        conversationDetails.value = List<Map>.from(response["conversations"]);
+        
+        // Cache the new data
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("cached_conversations", json.encode(response["conversations"]));
+        print("Refreshed with ${conversationDetails.length} conversations");
+      }
+    } catch (e) {
+      print("Error refreshing conversations: $e");
+    }
+  }
+
+  Future<void> loadConversationMessages(String conversationId, {bool clearFirst = true}) async {
+    try {
+      if (clearFirst) {
+        customerMessages.clear();
+      }
+      isLoading(true);
+      
+      final response = await RemoteServices().getConversationMessages(conversationId);
+      
+      if (response is Map<String, dynamic> && response["messages"] != null) {
+        List<dynamic> messages = response["messages"];
+        if (clearFirst) {
+          customerMessages.assignAll(messages);
+        } else {
+          // Avoid duplicates when not clearing first
+          for (var message in messages) {
+            bool exists = customerMessages.any((m) => 
+              m["content"] == message["content"] && 
+              m["createdAt"] == message["createdAt"]
+            );
+            if (!exists) {
+              customerMessages.add(message);
+            }
+          }
+        }
+        print("Loaded ${messages.length} messages for conversation $conversationId");
+      }
+      
+      isLoading(false);
+    } catch (e) {
+      print("Error loading conversation messages: $e");
+      isLoading(false);
+    }
+  }
+
+  Future<void> sendMessage(
     String receiverId,
     String content,
-  ) {
-    socket.emitWithAck(
-      "directMessage",
-      {
-        "receiverId": receiverId,
-        "content": content,
-      },
-      ack: (dynamic data) {
-        // messageSent.add(false);
-
-        if (data != null) {
-          // messageSent.add(data["success"]);
-          print("Ack received: $data");
-        } else {
-          print("No ack received");
-        }
-      },
-    );
+  ) async {
+    try {
+      // Send message via HTTP API to persist to database
+      final response = await RemoteServices().sendMessage(
+        receiverId: receiverId,
+        content: content,
+      );
+      
+      print("Send message response: $response");
+      
+      // Also emit via socket for real-time messaging
+      socket.emitWithAck(
+        "directMessage",
+        {
+          "receiverId": receiverId,
+          "content": content,
+        },
+        ack: (dynamic data) {
+          if (data != null) {
+            print("Socket ack received: $data");
+          } else {
+            print("No socket ack received");
+          }
+        },
+      );
+      
+      // Don't automatically refresh conversations here as it interferes with chat screen
+      // Only refresh when explicitly needed (like when going back to inbox)
+      
+    } catch (e) {
+      print("Error sending message: $e");
+    }
   }
 
   Future<String> uploadImage({

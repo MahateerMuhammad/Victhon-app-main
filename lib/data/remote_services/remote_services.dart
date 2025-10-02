@@ -363,6 +363,45 @@ class RemoteServices {
     }
   }
 
+  Future<dynamic> sendMessage({
+    required String receiverId,
+    required String content,
+  }) async {
+    final ApiResponse response = await server.postRequest(
+      endPoint: ApiList.sendMessage,
+      headers: AppServer.getHttpHeadersWithToken(),
+      body: {
+        "receiverId": receiverId,
+        "content": content,
+      },
+    );
+
+    if (response.isSuccess) {
+      final data = response.data;
+      print("Send message success: $data");
+      return data;
+    } else {
+      print("Send message error: ${response.errorMessage}");
+      return response;
+    }
+  }
+
+  Future<dynamic> getConversationMessages(String conversationId) async {
+    final ApiResponse response = await server.getRequest(
+      endPoint: "${ApiList.getConversationMessages}$conversationId",
+      headers: AppServer.getHttpHeadersWithToken(),
+    );
+
+    if (response.isSuccess) {
+      final data = response.data;
+      print("Conversation messages: $data");
+      return data;
+    } else {
+      print("Get messages error: ${response.errorMessage}");
+      return response;
+    }
+  }
+
   Future<dynamic> getRatingsAndReviews() async {
     final ApiResponse response = await server.getRequest(
       endPoint: ApiList.getRatingsAndReviews,

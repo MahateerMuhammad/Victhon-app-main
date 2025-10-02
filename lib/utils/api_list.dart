@@ -1,16 +1,16 @@
 
 class ApiList {
-  static const baseUrl = "https://10.135.129.44:3000";
-  static const String socketUrl = "https://victhon-backend-mbyv.onrender.com";
+  static const baseUrl = "http://192.168.18.251:3000";
+  static const String socketUrl = "http://192.168.18.251:3000";
 
-  // static const login = "$baseUrl/auth/user/login?role=";
-  // static const customerGoogleAuth = "$baseUrl/auth/google";
-  // static const serviceProviderGoogleAuth = "$baseUrl/auth/google/callback/provider";
+  static const login = "$baseUrl/auth/user/login?role=";
+  static const customerGoogleAuth = "$baseUrl/auth/google";
+  static const serviceProviderGoogleAuth = "$baseUrl/auth/google/callback/provider";
 
 
   static const signUp = "$baseUrl/auth/user/signup/initiate?role=";
   static const signIn = "$baseUrl/auth/user/login?role=";
-  static const googleAuth = "$baseUrl/auth/google/mobile/";
+  static const googleAuth = "$baseUrl/auth/google/";
 
 
   static const forgotPassword = "$baseUrl/auth/ResetPassword/initiate";
@@ -27,7 +27,7 @@ class ApiList {
 
   //Notification
   static const sendOneSignalPlayerId= "$baseUrl/notifications/update/player-id";
-  static const notifications = "$baseUrl/notifications/GetAll";
+  static const notifications = "$baseUrl/notifications";
   static const createNotifiPreference = "$baseUrl/notification-preferences/create";
   static const updateNotifiPreference = "$baseUrl/notification-preferences/update";
   static const getNotifiPreference = "$baseUrl/notification-preferences/get";
@@ -61,6 +61,9 @@ class ApiList {
 
   //Chat
   static const getConversation = "$baseUrl/conversations";
+  static const sendMessage = "$baseUrl/sendMessage";
+  static const getConversationMessages = "$baseUrl/conversations/";
+  static const createConversation = "$baseUrl/conversations/create";
 
   //Earnings/Wallet
   static const payForService = "$baseUrl/payments/initialize/";

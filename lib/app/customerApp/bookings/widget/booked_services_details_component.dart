@@ -13,7 +13,7 @@ import 'package:Victhon/widget/app_outline_button.dart';
 import '../../../../config/theme/app_color.dart';
 import '../../../../utils/functions.dart';
 import '../../../../widget/textwidget.dart';
-import '../../bottonNavBar/view/bottom_nav_bar.dart';
+import '../../inbox/view/chat_screen_view.dart';
 
 class BookedServicesDetailsComponent extends StatelessWidget {
   BookedServicesDetailsComponent({
@@ -162,19 +162,27 @@ class BookedServicesDetailsComponent extends StatelessWidget {
                       height: 45,
                       child: OutlinedButton.icon(
                         onPressed: () {
-                          // if(inboxController.conversationDetails)
-                          // Get.to(() => ChatScreen(
-                          //           // isNewChat: true,
-                          //           serivceProviderDetails:
-                          //               service["providerId"],
-                          //         ))!
-                          //     .then((_) {
-
-                          Get.off(() => const CustomerBottomNavBar(
-                                index: 2,
-                              ));
-                          Get.find<InboxController>().fetchConversation();
-                          // });
+                          // Find existing conversation with this service provider
+                          final inboxController = Get.find<InboxController>();
+                          final serviceProviderId = service["providerId"]["userId"];
+                          
+                          // Look for existing conversation
+                          dynamic existingConversation;
+                          for (var conversation in inboxController.conversationDetails) {
+                            if (conversation["otherUser"]["userId"] == serviceProviderId) {
+                              existingConversation = conversation;
+                              break;
+                            }
+                          }
+                          
+                          // Navigate with existing conversation or new chat
+                          Get.to(() => ChatScreen(
+                                message: existingConversation,
+                                serivceProviderDetails: service["providerId"],
+                              ))!
+                              .then((_) {
+                            inboxController.refreshConversationsOnly();
+                          });
                         },
                         icon: const Icon(
                           CupertinoIcons.chat_bubble_text,

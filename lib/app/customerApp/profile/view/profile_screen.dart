@@ -89,7 +89,7 @@ class ProfileScreen extends StatelessWidget {
                                       TextWidget(
                                         text: profileController
                                             .profileDetails["email"],
-                                        fontSize: 16,
+                                        fontSize: 12,
                                         color: AppColor.primaryColor,
                                         fontWeight: FontWeight.w400,
                                       ),

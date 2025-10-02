@@ -173,7 +173,6 @@ class AuthController extends GetxController {
     isLoading(false);
 
     if (response.isSuccess) {
-      // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
       print("Response Data: $responseData");

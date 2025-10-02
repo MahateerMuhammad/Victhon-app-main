@@ -70,19 +70,37 @@ class MessagesScreen extends StatelessWidget {
               ),
             ),
           ),
-          Obx(() {
-            if (inboxController.isLoading.isTrue) {
-              return const SizedBox();
-            } else {
-              if (inboxController.conversationDetails.isEmpty) {
-                return const NoMessagesView(
-                  userType: "customer",
+          Expanded(
+            child: Obx(() {
+              if (inboxController.isLoading.isTrue) {
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColor.primaryColor),
+                      ),
+                      SizedBox(height: 16),
+                      TextWidget(
+                        text: "Loading conversations...",
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ],
+                  ),
                 );
               } else {
-                return Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: inboxController.conversationDetails.length,
+                if (inboxController.conversationDetails.isEmpty) {
+                  return const NoMessagesView(
+                    userType: "customer",
+                  );
+                } else {
+                  return RefreshIndicator(
+                    onRefresh: () => inboxController.refreshConversations(),
+                    color: AppColor.primaryColor,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: inboxController.conversationDetails.length,
                     itemBuilder: (context, index) {
                       final message =
                           inboxController.conversationDetails[index];
@@ -133,11 +151,12 @@ class MessagesScreen extends StatelessWidget {
                         ),
                       );
                     },
-                  ),
-                );
+                    ),
+                  );
+                }
               }
-            }
-          }),
+            }),
+          ),
         ],
       ),
     );

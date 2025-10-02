@@ -22,7 +22,7 @@ class ApiResponse<T> {
 }
 
 class AppServer {
-  static const Duration timeoutDuration = Duration(seconds: 30);
+  static const Duration timeoutDuration = Duration(seconds: 60);
 
   final networkService = Get.find<NetworkService>();
 

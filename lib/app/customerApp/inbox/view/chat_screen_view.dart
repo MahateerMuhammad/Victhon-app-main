@@ -37,6 +37,19 @@ class _ChatScreenState extends State<ChatScreen> {
   bool addButtonTap = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Load messages if we have an existing conversation
+    if (widget.message != null && widget.message["_id"] != null) {
+      print("Loading messages for existing conversation: ${widget.message["_id"]}");
+      inboxController.loadConversationMessages(widget.message["_id"]);
+    } else {
+      // Clear messages for new conversation
+      inboxController.customerMessages.clear();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     print("----------- ${widget.serivceProviderDetails}");
     return Scaffold(
@@ -48,22 +61,19 @@ class _ChatScreenState extends State<ChatScreen> {
         surfaceTintColor: AppColor.whiteColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () {
+            // Refresh conversations when going back to ensure new conversation shows up
+            inboxController.refreshConversationsOnly();
+            Get.back();
+          },
         ),
         title: Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Row(
             children: [
-              widget.message["otherUser"] == null
+              // Handle both existing conversation and new chat scenarios
+              (widget.message != null && widget.message["otherUser"] != null)
                   ? CircleAvatar(
-                      radius: 22,
-                      backgroundColor: Colors.grey.shade300,
-                      child: const Icon(
-                        Icons.person,
-                        color: AppColor.whiteColor,
-                      ),
-                    )
-                  : CircleAvatar(
                       radius: 22,
                       backgroundColor: Colors.grey.shade300,
                       backgroundImage: CachedNetworkImageProvider(
@@ -73,23 +83,37 @@ class _ChatScreenState extends State<ChatScreen> {
                           color: AppColor.whiteColor,
                         ),
                       ),
-                    ),
+                    )
+                  : widget.serivceProviderDetails != null
+                      ? CircleAvatar(
+                          radius: 22,
+                          backgroundColor: Colors.grey.shade300,
+                          backgroundImage: CachedNetworkImageProvider(
+                            widget.serivceProviderDetails["imageUrl"],
+                            errorListener: (error) => const Icon(
+                              Icons.person,
+                              color: AppColor.whiteColor,
+                            ),
+                          ),
+                        )
+                      : CircleAvatar(
+                          radius: 22,
+                          backgroundColor: Colors.grey.shade300,
+                          child: const Icon(
+                            Icons.person,
+                            color: AppColor.whiteColor,
+                          ),
+                        ),
               const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // widget.isNewChat
-                  //     ? TextWidget(
-                  //         text: widget.serivceProviderDetails["fullName"],
-                  //         fontSize: 16,
-                  //         fontWeight: FontWeight.w500,
-                  //         color: Colors.black,
-                  //       )
-                  //     :
                   TextWidget(
-                    text: widget.message["otherUser"] == null
-                        ? "Unknown User"
-                        : widget.message["otherUser"]["fullName"],
+                    text: (widget.message != null && widget.message["otherUser"] != null)
+                        ? widget.message["otherUser"]["fullName"]
+                        : widget.serivceProviderDetails != null
+                            ? widget.serivceProviderDetails["fullName"]
+                            : "Unknown User",
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
@@ -116,38 +140,39 @@ class _ChatScreenState extends State<ChatScreen> {
               controller: _scrollController,
               child: Column(
                 children: [
-                  // widget.isNewChat
-                  //     ? const SizedBox()
-                  //     :
-                  ListView.builder(
-                    // reverse: true, // <-- this reverses the list visually
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: (widget.message["messages"] as List).length,
-                    itemBuilder: (context, index) {
-                      final reversedIndex =
-                          (widget.message["messages"].length - 1) - index;
-                      final msg = widget.message["messages"][reversedIndex];
-                      final isSender = msg["isCurrentUser"] == true;
-                      final formattedTime =
-                          formatChatTimestamp(msg["timestamp"]);
+                  // Show existing messages only if we have an existing conversation
+                  (widget.message != null && widget.message["messages"] != null)
+                      ? ListView.builder(
+                          // reverse: true, // <-- this reverses the list visually
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.all(16),
+                          itemCount: (widget.message["messages"] as List).length,
+                          itemBuilder: (context, index) {
+                            final reversedIndex =
+                                (widget.message["messages"].length - 1) - index;
+                            final msg = widget.message["messages"][reversedIndex];
+                            final isSender = msg["isCurrentUser"] == true;
+                            final formattedTime =
+                                formatChatTimestamp(msg["timestamp"]);
 
-                      if (msg["content"].toString().isNotEmpty) {
-                        return msg["content"].toString().contains("http")
-                            ? _imageMessageBubble(
-                                imageUrl: msg["content"],
-                                time: formattedTime,
-                                isSender: isSender,
-                              )
-                            : _messageBubble(
-                                message: msg["content"],
-                                time: formattedTime,
-                                isSender: isSender,
-                              );
-                      }
-                    },
-                  ),
+                            if (msg["content"].toString().isNotEmpty) {
+                              return msg["content"].toString().contains("http")
+                                  ? _imageMessageBubble(
+                                      imageUrl: msg["content"],
+                                      time: formattedTime,
+                                      isSender: isSender,
+                                    )
+                                  : _messageBubble(
+                                      message: msg["content"],
+                                      time: formattedTime,
+                                      isSender: isSender,
+                                    );
+                            }
+                            return const SizedBox.shrink(); // Return empty widget if content is empty
+                          },
+                        )
+                      : const SizedBox(), // No existing messages for new chat
                   Obx(() {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (_scrollController.hasClients) {
@@ -231,23 +256,33 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       messageText.isNotEmpty
                           ? InkWell(
-                              onTap: () {
+                              onTap: () async {
                                 if (messageText.trim().isNotEmpty) {
-                                  inboxController.sendMessage(
-                                    widget.message["otherUser"]["userId"],
-                                    messageText,
-                                  );
+                                  // Get receiver ID from either existing conversation or service provider details
+                                  String receiverId = (widget.message != null && widget.message["otherUser"] != null)
+                                      ? widget.message["otherUser"]["userId"]
+                                      : widget.serivceProviderDetails["userId"];
+                                  
+                                  // Add message locally first for immediate UI feedback
                                   inboxController.addMessage({
                                     "content": messageText,
                                     "isCurrentUser": true,
                                     "createdAt": now.toIso8601String(),
                                   });
-                                  print(
-                                      "_________________ ${inboxController.customerMessages}");
+                                  
+                                  String currentMessage = messageText;
                                   inboxController.messageController.clear();
                                   setState(() {
                                     messageText = '';
                                   });
+                                  
+                                  // Send message to backend
+                                  await inboxController.sendMessage(
+                                    receiverId,
+                                    currentMessage,
+                                  );
+                                  
+                                  print("_________________ ${inboxController.customerMessages}");
                                 }
                               },
                               child: const CircleAvatar(
@@ -299,8 +334,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                     size: 24,
                                   ),
                                   onPressed: () {
-                                    pickMedia(ImageSource.camera,
-                                        widget.message["otherUser"]["userId"]);
+                                    String receiverId = (widget.message != null && widget.message["otherUser"] != null)
+                                        ? widget.message["otherUser"]["userId"]
+                                        : widget.serivceProviderDetails["userId"];
+                                    pickMedia(ImageSource.camera, receiverId);
                                   },
                                 ),
                                 const SizedBox(
@@ -315,8 +352,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                     size: 24,
                                   ),
                                   onPressed: () {
-                                    pickMedia(ImageSource.gallery,
-                                        widget.message["otherUser"]["userId"]);
+                                    String receiverId = (widget.message != null && widget.message["otherUser"] != null)
+                                        ? widget.message["otherUser"]["userId"]
+                                        : widget.serivceProviderDetails["userId"];
+                                    pickMedia(ImageSource.gallery, receiverId);
                                   },
                                 ),
                               ],
