@@ -64,6 +64,7 @@ class ApiList {
   static const sendMessage = "$baseUrl/sendMessage";
   static const getConversationMessages = "$baseUrl/conversations/";
   static const createConversation = "$baseUrl/conversations/create";
+  static const getMessageHistory = "$baseUrl/history/{userId}";
 
   //Earnings/Wallet
   static const payForService = "$baseUrl/payments/initialize/";
