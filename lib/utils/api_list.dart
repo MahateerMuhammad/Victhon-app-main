@@ -1,6 +1,6 @@
 class ApiList {
-  static const baseUrl = "http://10.135.133.255:3000";
-  static const String socketUrl = "http://10.135.133.255:3000";
+  static const baseUrl = "http://192.168.100.191:3000";
+  static const String socketUrl = "http://192.168.100.191:3000";
 
   static const login = "$baseUrl/auth/user/login?role=";
   static const customerGoogleAuth = "$baseUrl/auth/google/mobile/customer";
@@ -39,9 +39,9 @@ class ApiList {
   static const providerServices = "$baseUrl/services/provider";
 
   static const getTopCategories = "$baseUrl/booking/top-categories";
-  static const createServices = "$baseUrl/services/create";
-  static const updateServices = "$baseUrl/services/update/";
-  static const deleteServices = "$baseUrl/services/";
+  static const createServices = "$baseUrl/booking/services/create";
+  static const updateServices = "$baseUrl/booking/service/update/";
+  static const deleteServices = "$baseUrl/booking/service/";
 
   static const getAllCategories = "$baseUrl/booking/category/find";
 
@@ -74,7 +74,7 @@ class ApiList {
   //Banks
   static const getAllBanks = "$baseUrl/banks/paystack/all";
   static const getBankAccount = "$baseUrl/banks/account/all";
-  static const addBankAccount = "$baseUrl/banks/acount/add";
+  static const addBankAccount = "$baseUrl/banks/account/add";
   static const deleteBankAccount = "$baseUrl/banks/account/";
 
   //ratings and review

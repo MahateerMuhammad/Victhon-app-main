@@ -175,7 +175,7 @@ class AuthController extends GetxController {
     if (response.isSuccess) {
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
 
       isLoading(false);
       isFormFilled.value = false;
@@ -190,7 +190,7 @@ class AuthController extends GetxController {
       customSnackbar("SUCCESS".tr, 'OTP sent successfully!'.toString().tr,
           AppColor.success);
     } else {
-      print("--------- $response");
+      debugPrint("--------- $response");
 
       isLoading(false);
       final errorMessage = response.errorMessage ?? "An error occurred";
@@ -218,7 +218,7 @@ class AuthController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       box.write('token', responseData["access_token"]);
 
       isLoading(false);
@@ -237,7 +237,7 @@ class AuthController extends GetxController {
       update();
       passwordController.clear();
     } else {
-      print("--------- $response");
+      debugPrint("--------- $response");
 
       isLoading(false);
       final errorMessage = response.errorMessage ?? "An error occurred";
@@ -259,7 +259,7 @@ class AuthController extends GetxController {
       otp: otp,
       userType: userType,
     );
-    print("Response --- Data: ${response.data}");
+    debugPrint("Response --- Data: ${response.data}");
 
     isLoading(false);
 
@@ -267,7 +267,7 @@ class AuthController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       box.write('token', responseData["access_token"]);
       pinController.clear();
       identifierController.clear();
@@ -279,7 +279,6 @@ class AuthController extends GetxController {
       // Handling the response based on the data structure
       if (responseData is Map<String, dynamic> &&
           responseData.containsKey('message')) {
-
         customSnackbar(
           "SUCCESS".tr,
           "${responseData['message'].toString()} Please try again",
@@ -312,14 +311,14 @@ class AuthController extends GetxController {
       identifier: identifier,
     );
     isLoading(false);
-    print("Response Data: $response");
-    print("Response Data: ${response.isSuccess}");
+    debugPrint("Response Data: $response");
+    debugPrint("Response Data: ${response.isSuccess}");
 
     if (response.isSuccess) {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       identifierController.clear();
       isFormFilled.value = false;
 
@@ -335,7 +334,7 @@ class AuthController extends GetxController {
       update();
       passwordController.clear();
     } else {
-      print("--------- $response");
+      debugPrint("--------- $response");
 
       isLoading(false);
       final errorMessage = response.errorMessage ?? "An error occurred";
@@ -363,7 +362,7 @@ class AuthController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
 
       // Handling the response based on the data structure
       isFormFilled.value = false;
@@ -402,7 +401,7 @@ class AuthController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       box.write('token', responseData["access_token"]);
 
       customSnackbar(
@@ -412,7 +411,7 @@ class AuthController extends GetxController {
 
       passwordController.clear();
     } else {
-      print("--------- $response");
+      debugPrint("--------- $response");
 
       isLoading(false);
       final errorMessage = response.errorMessage ?? "An error occurred";
@@ -447,7 +446,7 @@ class AuthController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       update();
       identifierController.clear();
       isFormFilled.value = false;

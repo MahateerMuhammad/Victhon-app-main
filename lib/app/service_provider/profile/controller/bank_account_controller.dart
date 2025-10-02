@@ -17,7 +17,6 @@ class BankAccountController extends GetxController {
   final TextEditingController accountNameController = TextEditingController();
   RxString selectedBankId = ''.obs;
 
-
   @override
   void onInit() {
     super.onInit();
@@ -26,7 +25,7 @@ class BankAccountController extends GetxController {
   }
 
   Future<void> fetchAccountDetails() async {
-    print("heyyyyyyyy fetch accountDetails");
+    debugPrint("heyyyyyyyy fetch accountDetails");
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Check if services exist in local storage
@@ -38,8 +37,8 @@ class BankAccountController extends GetxController {
 
     // Fetch new services from API
     final response = await RemoteServices().getBankAccounts();
-    print("@@@@@@@@@@ ${response["data"]} @@@@@@@@@@");
-    print("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
+    debugPrint("@@@@@@@@@@ ${response["data"]} @@@@@@@@@@");
+    debugPrint("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
 
     if (response is Map<String, dynamic>) {
       accountDetails.value = response["data"];
@@ -49,7 +48,7 @@ class BankAccountController extends GetxController {
   }
 
   // Future<void> fetchAllBanks() async {
-  //   print("heyyyyyyyy fetch accountDetails");
+  //   debugPrint("heyyyyyyyy fetch accountDetails");
   //   // SharedPreferences prefs = await SharedPreferences.getInstance();
 
   //   // // Check if services exist in local storage
@@ -61,8 +60,8 @@ class BankAccountController extends GetxController {
 
   //   // Fetch new services from API
   //   final response = await RemoteServices().getAllBanks();
-  //   print("@@@@@@@@@@ ${response} @@@@@@@@@@");
-  //   print("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
+  //   debugPrint("@@@@@@@@@@ ${response} @@@@@@@@@@");
+  //   debugPrint("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
 
   //   if (response is List<dynamic>) {
   //     bankDetails.value = response;
@@ -91,7 +90,7 @@ class BankAccountController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       Get.snackbar(
         "Success".tr,
         "Bank Account Added",
@@ -105,7 +104,7 @@ class BankAccountController extends GetxController {
 
       update();
     } else {
-      print("--------- $response");
+      debugPrint("--------- $response");
 
       isLoading(false);
       final errorMessage = response.errorMessage ?? "An error occurred";
@@ -131,7 +130,7 @@ class BankAccountController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       Get.snackbar(
         "Success".tr,
         "Bank Account Added",
@@ -144,7 +143,7 @@ class BankAccountController extends GetxController {
 
       update();
     } else {
-      print("--------- $response");
+      debugPrint("--------- $response");
 
       isLoading(false);
       final errorMessage = response.errorMessage ?? "An error occurred";

@@ -178,13 +178,42 @@ class AppServer {
     String endPoint,
     File filepath,
   ) async {
+    // ✅ Check if connected to the internet
+    final hasConnection = await InternetConnectionChecker().hasConnection;
+    if (!hasConnection) {
+      debugPrint("⚠️ No internet connection");
+      customSnackbar("ERROR".tr, "No Internet Connection", AppColor.error);
+      return ApiResponse(
+        statusCode: 0,
+        errorMessage: "No internet connection",
+      );
+    }
+
     try {
+      // Create multipart headers without Content-Type (it will be set automatically)
+      var headers = getHttpHeadersWithTokenForMultipart();
+
       var request = http.MultipartRequest('POST', Uri.parse(endPoint))
-        ..headers.addAll(getHttpHeadersWithToken())
+        ..headers.addAll(headers)
         ..files.add(await http.MultipartFile.fromPath('file', filepath.path));
 
-      // Send request
-      var streamedResponse = await request.send();
+      // Extract role from URL and add as form field if present
+      Uri uri = Uri.parse(endPoint);
+      if (uri.queryParameters.containsKey('role')) {
+        String role = uri.queryParameters['role']!;
+        request.fields['role'] = role;
+        debugPrint("Adding role as form field: $role");
+      }
+
+      debugPrint("Upload endpoint: $endPoint");
+      debugPrint("File path: ${filepath.path}");
+      debugPrint("File exists: ${await filepath.exists()}");
+      debugPrint("File size: ${await filepath.length()} bytes");
+      debugPrint("Headers: $headers");
+      debugPrint("Form fields: ${request.fields}");
+
+      // Send request with timeout
+      var streamedResponse = await request.send().timeout(timeoutDuration);
 
       // Convert StreamedResponse to Response
       var response = await http.Response.fromStream(streamedResponse);
@@ -197,17 +226,33 @@ class AppServer {
         return ApiResponse(
             data: response.body, statusCode: response.statusCode);
       } else {
+        // Try to parse error message from response body
+        String errorMessage = "Upload failed";
+        try {
+          var errorData = jsonDecode(response.body);
+          errorMessage = errorData['message'] ?? errorMessage;
+        } catch (e) {
+          // If parsing fails, use default message
+        }
+
         return ApiResponse(
-            statusCode: response.statusCode, errorMessage: "Unexpected Error");
+            statusCode: response.statusCode, errorMessage: errorMessage);
       }
-    } on DioException catch (e) {
-      debugPrint("errrrrrrorrrrr ${e.response?.statusCode}");
+    } on http.ClientException catch (e) {
+      debugPrint("HTTP Client Error: $e");
       return ApiResponse(
-        statusCode: e.response?.statusCode ?? 500,
-        errorMessage: e.response?.data?['message'] ?? 'Something went wrong',
+        statusCode: 500,
+        errorMessage: 'Network error: ${e.message}',
+      );
+    } on FormatException catch (e) {
+      debugPrint("Format Error: $e");
+      return ApiResponse(
+        statusCode: 500,
+        errorMessage: 'Invalid file format',
       );
     } catch (e) {
-      return ApiResponse(statusCode: 500, errorMessage: 'Error: $e');
+      debugPrint("Upload Error: $e");
+      return ApiResponse(statusCode: 500, errorMessage: 'Upload failed: $e');
     }
   }
 
@@ -404,6 +449,17 @@ class AppServer {
     headers['Authorization'] = "Bearer $token";
     // headers['x-api-key'] = ApiList.licenseCode.toString();
     headers['Content-Type'] = 'application/json';
+    // headers['Accept'] = "*/*";
+    // headers['Access-Control-Allow-Origin'] = "*";
+    return headers;
+  }
+
+  static Map<String, String> getHttpHeadersWithTokenForMultipart() {
+    var token = box.read('token');
+    Map<String, String> headers = Map<String, String>();
+    headers['Authorization'] = "Bearer $token";
+    // headers['x-api-key'] = ApiList.licenseCode.toString();
+    // Don't set Content-Type for multipart requests - it will be set automatically
     // headers['Accept'] = "*/*";
     // headers['Access-Control-Allow-Origin'] = "*";
     return headers;

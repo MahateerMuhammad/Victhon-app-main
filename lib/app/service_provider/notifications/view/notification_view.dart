@@ -23,7 +23,7 @@ class NotificationView extends StatelessWidget {
       appBar: AppBar(
         surfaceTintColor: AppColor.whiteColor,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Get.back(),
         ),
         title: const TextWidget(

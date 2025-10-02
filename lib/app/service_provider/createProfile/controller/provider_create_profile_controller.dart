@@ -5,13 +5,12 @@ import 'package:Victhon/app/service_provider/createProfile/views/add_bank_detail
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Victhon/app/service_provider/bookings/widget/bookings_dailog.dart';
-import 'package:Victhon/utils/icons.dart';
 
 import '../../../../config/theme/app_color.dart';
 import '../../../../data/remote_services/remote_services.dart';
 import '../../../../data/server/app_server.dart';
 import '../../../../main.dart';
+import '../../../../utils/api_list.dart';
 import '../../../../widget/custom_snackbar.dart';
 import '../../../customerApp/auth/views/welcome_message_screen.dart';
 
@@ -122,28 +121,103 @@ class ProviderCreateProfileController extends GetxController {
     required BuildContext context,
   }) async {
     isLoading(true);
-    ApiResponse response =
-        await RemoteServices().uploadMedia(imageFile: imageFile);
-    isLoading(false);
-    if (response.isSuccess) {
-      // ✅ Check if widget is still mounted before using BuildContext
 
-      final dynamic responseData = jsonDecode(response.data);
-      print("type ${responseData.runtimeType}");
+    try {
+      // Validate file before upload
+      if (!await imageFile.exists()) {
+        isLoading(false);
+        customSnackbar(
+            "ERROR".tr, "Selected image file not found", AppColor.error);
+        return;
+      }
 
-      print("responseData $responseData");
-      profileImageUrl.value = responseData["imageUrl"];
-      print("profileImage Data: ${profileImageUrl.value}");
+      // Check file size (limit to 5MB)
+      final fileSize = await imageFile.length();
+      if (fileSize > 5 * 1024 * 1024) {
+        isLoading(false);
+        customSnackbar(
+            "ERROR".tr,
+            "Image file is too large. Please select an image smaller than 5MB",
+            AppColor.error);
+        return;
+      }
 
-      Get.to(() => AddBankDetails());
+      print("Uploading image: ${imageFile.path}");
+      print("File size: ${fileSize} bytes");
+      print("Using endpoint: ${ApiList.profileImage}provider");
 
-      // }
-    } else {
-      print(response.errorMessage);
-      print(response.statusCode);
+      ApiResponse response = await RemoteServices()
+          .addServiceProviderProfileImage(imageFile: imageFile);
+      isLoading(false);
 
-      const errorMessage = "An error occurred, please try again";
-      customSnackbar("ERROR".tr, errorMessage, AppColor.error);
+      if (response.isSuccess) {
+        try {
+          final dynamic responseData = jsonDecode(response.data);
+          print("Upload response type: ${responseData.runtimeType}");
+          print("Upload response data: $responseData");
+
+          // Handle both possible response formats
+          String? imageUrl;
+          if (responseData is Map<String, dynamic>) {
+            if (responseData["imageUrl"] != null) {
+              // Single image URL format
+              imageUrl = responseData["imageUrl"];
+            } else if (responseData["imageUrls"] != null &&
+                responseData["imageUrls"] is List &&
+                responseData["imageUrls"].isNotEmpty) {
+              // Array of image URLs format
+              imageUrl = responseData["imageUrls"][0];
+            }
+          }
+
+          if (imageUrl != null && imageUrl.isNotEmpty) {
+            profileImageUrl.value = imageUrl;
+            print("Profile image URL: ${profileImageUrl.value}");
+
+            // Navigate to next screen
+            Get.to(() => AddBankDetails());
+          } else {
+            print("No image URL found in response: $responseData");
+            customSnackbar("ERROR".tr,
+                "Invalid response from server - no image URL", AppColor.error);
+          }
+        } catch (e) {
+          print("Error parsing upload response: $e");
+          customSnackbar(
+              "ERROR".tr, "Failed to process server response", AppColor.error);
+        }
+      } else {
+        print("Upload failed - Status: ${response.statusCode}");
+        print("Upload failed - Error: ${response.errorMessage}");
+
+        // Provide more specific error messages
+        String errorMessage = response.errorMessage ?? "Upload failed";
+
+        if (response.statusCode == 0) {
+          errorMessage =
+              "No internet connection. Please check your network and try again";
+        } else if (response.statusCode == 413) {
+          errorMessage = "Image file is too large";
+        } else if (response.statusCode == 415) {
+          errorMessage = "Unsupported image format";
+        } else if (response.statusCode == 401) {
+          errorMessage = "Authentication failed. Please login again";
+        } else if (response.statusCode == 404) {
+          errorMessage =
+              "Profile not found. Please complete your profile first";
+        } else if (response.statusCode == 400) {
+          errorMessage = "Invalid request. Please try again";
+        } else if (response.statusCode == 500) {
+          errorMessage = "Server error. Please try again later";
+        }
+
+        customSnackbar("ERROR".tr, errorMessage, AppColor.error);
+      }
+    } catch (e) {
+      isLoading(false);
+      print("Unexpected error during image upload: $e");
+      customSnackbar(
+          "ERROR".tr, "An unexpected error occurred: $e", AppColor.error);
     }
   }
 
@@ -163,9 +237,17 @@ class ProviderCreateProfileController extends GetxController {
     print("@@@@@@@@@@ ${response} @@@@@@@@@@");
     print("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
 
-    if (response is Map<String, dynamic>) {
+    if (response is ApiResponse && response.isSuccess) {
+      final data = response.data;
+      if (data is Map<String, dynamic> && data["data"] != null) {
+        bankDetails.value = data["data"];
+        await prefs.setString(
+            "cached_bankDetails", json.encode(data["data"]));
+      }
+    } else if (response is Map<String, dynamic>) {
       bankDetails.value = response["data"];
-      await prefs.setString("cached_bankDetails", json.encode(response["data"]));
+      await prefs.setString(
+          "cached_bankDetails", json.encode(response["data"]));
     }
   }
 

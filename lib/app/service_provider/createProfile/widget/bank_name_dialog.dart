@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Victhon/app/service_provider/createProfile/controller/provider_create_profile_controller.dart';
@@ -150,7 +149,7 @@ class _SelectBankDialogState extends State<SelectBankDialog> {
                     },
                     decoration: InputDecoration(
                       hintText: "Search Bank Name",
-                      hintStyle: TextStyle(color: Colors.grey),
+                      hintStyle: const TextStyle(color: Colors.grey),
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       filled: false,
                       contentPadding: const EdgeInsets.fromLTRB(8, 8, 16, 8),

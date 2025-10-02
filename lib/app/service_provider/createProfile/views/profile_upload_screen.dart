@@ -8,6 +8,7 @@ import '../../../../config/theme/app_color.dart';
 import '../../../../widget/app_outline_button.dart';
 import '../../../../widget/loader.dart';
 import '../../../../widget/textwidget.dart';
+import '../../../../widget/custom_snackbar.dart';
 import '../controller/provider_create_profile_controller.dart';
 
 class ProfileUploadScreen extends StatefulWidget {
@@ -152,12 +153,7 @@ class _ProfileUploadScreenState extends State<ProfileUploadScreen> {
                   buttonText: "Camera",
                   onPressed: () async {
                     Navigator.pop(context);
-                    final pickedFile =
-                        await _picker.pickImage(source: ImageSource.camera);
-                    if (pickedFile != null) {
-                      _image = File(pickedFile.path);
-                      setState(() {});
-                    }
+                    await _pickImageFromSource(ImageSource.camera);
                   },
                   buttonColor: AppColor.primaryColor,
                   textColor: AppColor.whiteColor,
@@ -167,12 +163,7 @@ class _ProfileUploadScreenState extends State<ProfileUploadScreen> {
                   buttonText: "Album",
                   onPressed: () async {
                     Navigator.pop(context);
-                    final pickedFile =
-                        await _picker.pickImage(source: ImageSource.gallery);
-                    if (pickedFile != null) {
-                      _image = File(pickedFile.path);
-                      setState(() {});
-                    }
+                    await _pickImageFromSource(ImageSource.gallery);
                   },
                   textColor: AppColor.primaryColor,
                   borderColor: AppColor.primaryColor,
@@ -181,5 +172,43 @@ class _ProfileUploadScreenState extends State<ProfileUploadScreen> {
             ),
           );
         });
+  }
+
+  Future<void> _pickImageFromSource(ImageSource source) async {
+    try {
+      final pickedFile = await _picker.pickImage(
+        source: source,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85, // Compress image to reduce file size
+      );
+
+      if (pickedFile != null) {
+        final file = File(pickedFile.path);
+
+        // Validate file exists
+        if (await file.exists()) {
+          // Check file size (5MB limit)
+          final fileSize = await file.length();
+          if (fileSize > 5 * 1024 * 1024) {
+            customSnackbar(
+                "ERROR".tr,
+                "Image is too large. Please select an image smaller than 5MB",
+                AppColor.error);
+            return;
+          }
+
+          _image = file;
+          setState(() {});
+          print("Image selected: ${file.path}, Size: ${fileSize} bytes");
+        } else {
+          customSnackbar(
+              "ERROR".tr, "Failed to access selected image", AppColor.error);
+        }
+      }
+    } catch (e) {
+      print("Error picking image: $e");
+      customSnackbar("ERROR".tr, "Failed to select image: $e", AppColor.error);
+    }
   }
 }

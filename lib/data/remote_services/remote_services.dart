@@ -234,7 +234,7 @@ class RemoteServices {
     required File imageFile,
   }) async {
     final response = await server.multipartRequest(
-      "${ApiList.profileImage}serviceProvider",
+      "${ApiList.profileImage}provider",
       imageFile,
     );
 

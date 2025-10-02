@@ -41,7 +41,8 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     // Load messages if we have an existing conversation
     if (widget.message != null && widget.message["_id"] != null) {
-      print("Loading messages for existing conversation: ${widget.message["_id"]}");
+      debugPrint(
+          "Loading messages for existing conversation: ${widget.message["_id"]}");
       inboxController.loadConversationMessages(widget.message["_id"]);
     } else {
       // Clear messages for new conversation
@@ -51,7 +52,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("----------- ${widget.serivceProviderDetails}");
+    debugPrint("----------- ${widget.serivceProviderDetails}");
     return Scaffold(
       backgroundColor: AppColor.primaryCardColor,
       resizeToAvoidBottomInset: true,
@@ -109,7 +110,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextWidget(
-                    text: (widget.message != null && widget.message["otherUser"] != null)
+                    text: (widget.message != null &&
+                            widget.message["otherUser"] != null)
                         ? widget.message["otherUser"]["fullName"]
                         : widget.serivceProviderDetails != null
                             ? widget.serivceProviderDetails["fullName"]
@@ -147,11 +149,13 @@ class _ChatScreenState extends State<ChatScreen> {
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           padding: const EdgeInsets.all(16),
-                          itemCount: (widget.message["messages"] as List).length,
+                          itemCount:
+                              (widget.message["messages"] as List).length,
                           itemBuilder: (context, index) {
                             final reversedIndex =
                                 (widget.message["messages"].length - 1) - index;
-                            final msg = widget.message["messages"][reversedIndex];
+                            final msg =
+                                widget.message["messages"][reversedIndex];
                             final isSender = msg["isCurrentUser"] == true;
                             final formattedTime =
                                 formatChatTimestamp(msg["timestamp"]);
@@ -169,7 +173,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                       isSender: isSender,
                                     );
                             }
-                            return const SizedBox.shrink(); // Return empty widget if content is empty
+                            return const SizedBox
+                                .shrink(); // Return empty widget if content is empty
                           },
                         )
                       : const SizedBox(), // No existing messages for new chat
@@ -259,30 +264,32 @@ class _ChatScreenState extends State<ChatScreen> {
                               onTap: () async {
                                 if (messageText.trim().isNotEmpty) {
                                   // Get receiver ID from either existing conversation or service provider details
-                                  String receiverId = (widget.message != null && widget.message["otherUser"] != null)
+                                  String receiverId = (widget.message != null &&
+                                          widget.message["otherUser"] != null)
                                       ? widget.message["otherUser"]["userId"]
                                       : widget.serivceProviderDetails["userId"];
-                                  
+
                                   // Add message locally first for immediate UI feedback
                                   inboxController.addMessage({
                                     "content": messageText,
                                     "isCurrentUser": true,
                                     "createdAt": now.toIso8601String(),
                                   });
-                                  
+
                                   String currentMessage = messageText;
                                   inboxController.messageController.clear();
                                   setState(() {
                                     messageText = '';
                                   });
-                                  
+
                                   // Send message to backend
                                   await inboxController.sendMessage(
                                     receiverId,
                                     currentMessage,
                                   );
-                                  
-                                  print("_________________ ${inboxController.customerMessages}");
+
+                                  debugPrint(
+                                      "_________________ ${inboxController.customerMessages}");
                                 }
                               },
                               child: const CircleAvatar(
@@ -334,9 +341,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                     size: 24,
                                   ),
                                   onPressed: () {
-                                    String receiverId = (widget.message != null && widget.message["otherUser"] != null)
+                                    String receiverId = (widget.message !=
+                                                null &&
+                                            widget.message["otherUser"] != null)
                                         ? widget.message["otherUser"]["userId"]
-                                        : widget.serivceProviderDetails["userId"];
+                                        : widget
+                                            .serivceProviderDetails["userId"];
                                     pickMedia(ImageSource.camera, receiverId);
                                   },
                                 ),
@@ -352,9 +362,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                     size: 24,
                                   ),
                                   onPressed: () {
-                                    String receiverId = (widget.message != null && widget.message["otherUser"] != null)
+                                    String receiverId = (widget.message !=
+                                                null &&
+                                            widget.message["otherUser"] != null)
                                         ? widget.message["otherUser"]["userId"]
-                                        : widget.serivceProviderDetails["userId"];
+                                        : widget
+                                            .serivceProviderDetails["userId"];
                                     pickMedia(ImageSource.gallery, receiverId);
                                   },
                                 ),
@@ -412,7 +425,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                 if (isSender)
                   Padding(
-                    padding: EdgeInsets.only(left: 5),
+                    padding: const EdgeInsets.only(left: 5),
                     child: networkService.isConnected.value
                         ? const Icon(Icons.done_all,
                             color: Colors.grey, size: 16)

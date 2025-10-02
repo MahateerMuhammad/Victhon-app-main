@@ -66,7 +66,7 @@ class ServiceProviderProfileController extends GetxController {
   }
 
   Future<void> fetchProfile() async {
-    print("heyyyyyyyy fetch profileDetails");
+    debugPrint("heyyyyyyyy fetch profileDetails");
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Check if services exist in local storage
@@ -84,8 +84,8 @@ class ServiceProviderProfileController extends GetxController {
 
     // Fetch new services from API
     final response = await RemoteServices().getServiceProviderProfile();
-    print("@@@@@@@@@@ ${response} @@@@@@@@@@");
-    print("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
+    debugPrint("@@@@@@@@@@ $response @@@@@@@@@@");
+    debugPrint("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
 
     if (response is Map<String, dynamic>) {
       profileDetails.value = response["profile"];
@@ -116,7 +116,7 @@ class ServiceProviderProfileController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
 
       // Get.back();
       profileDetails.value = responseData["profile"];
@@ -129,7 +129,7 @@ class ServiceProviderProfileController extends GetxController {
         AppColor.greenColor,
       );
     } else {
-      print("--------- $response");
+      debugPrint("--------- $response");
 
       isLoading(false);
       final errorMessage = response.errorMessage ?? "An error occurred";
@@ -149,20 +149,32 @@ class ServiceProviderProfileController extends GetxController {
       // ✅ Check if widget is still mounted before using BuildContext
 
       final dynamic responseData = jsonDecode(response.data);
-      print("prfileIm Data: ${responseData["imageUrls"][0]}");
+      debugPrint("Profile Image Response Data: $responseData");
 
-      profileImageUrl.value = responseData["imageUrls"][0];
-      print("profileImage Data: ${profileImageUrl.value}");
+      // Handle both possible response formats
+      String? imageUrl;
+      if (responseData is Map<String, dynamic>) {
+        if (responseData["imageUrl"] != null) {
+          imageUrl = responseData["imageUrl"];
+        } else if (responseData["imageUrls"] != null &&
+            responseData["imageUrls"] is List &&
+            responseData["imageUrls"].isNotEmpty) {
+          imageUrl = responseData["imageUrls"][0];
+        }
+      }
 
-      customSnackbar(
-        "Success",
-        "Profile image updated successfully",
-        AppColor.greenColor,
-      );
+      if (imageUrl != null) {
+        profileImageUrl.value = imageUrl;
+        debugPrint("profileImage Data: ${profileImageUrl.value}");
 
-      // }
+        customSnackbar(
+          "Success",
+          "Profile image updated successfully",
+          AppColor.greenColor,
+        );
+      }
     } else {
-      print(response.errorMessage);
+      debugPrint(response.errorMessage);
       const errorMessage = "An error occurred";
       customSnackbar("ERROR".tr, errorMessage, AppColor.error);
     }
@@ -182,7 +194,7 @@ class ServiceProviderProfileController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       Get.snackbar("Success", "Pin created successfully");
       if (context.mounted) {
         showStatusDialog(
@@ -198,7 +210,7 @@ class ServiceProviderProfileController extends GetxController {
 
       update();
     } else {
-      print("--------- $response");
+      debugPrint("--------- $response");
 
       isLoading(false);
       final errorMessage = response.errorMessage ?? "An error occurred";
@@ -211,7 +223,7 @@ class ServiceProviderProfileController extends GetxController {
   }
 
   Future<void> fetchNotifiPreference() async {
-    print("heyyyyyyyy fetch NotifiPreference");
+    debugPrint("heyyyyyyyy fetch NotifiPreference");
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Check if services exist in local storage
@@ -227,8 +239,8 @@ class ServiceProviderProfileController extends GetxController {
 
     // Fetch new services from API
     final response = await RemoteServices().getNotifiPreference();
-    print("@@@@@@@@@@ ${response["data"]} @@@@@@@@@@");
-    print("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
+    debugPrint("@@@@@@@@@@ ${response["data"]} @@@@@@@@@@");
+    debugPrint("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
 
     if (response is Map<String, dynamic>) {
       notifiPreference.value = response["data"];
@@ -261,7 +273,7 @@ class ServiceProviderProfileController extends GetxController {
       // ✅ Check if widget is still mounted before using BuildContext
 
       final dynamic responseData = response.data["data"];
-      print("responseData Data: $responseData");
+      debugPrint("responseData Data: $responseData");
       bookingRequests.value = responseData["bookingRequests"];
       messages.value = responseData["messages"];
       payments.value = responseData["payments"];
@@ -272,7 +284,7 @@ class ServiceProviderProfileController extends GetxController {
       //   "Deleted successfully",
       // );
     } else {
-      print(response.errorMessage);
+      debugPrint(response.errorMessage);
       const errorMessage = "An error occurred";
       Get.snackbar(
         "ERROR".tr,

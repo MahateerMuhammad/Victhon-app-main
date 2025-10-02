@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,7 +11,6 @@ class NotificationsController extends GetxController {
 
   RxList<dynamic> notifications = <dynamic>[].obs; // Stores services
 
-
   @override
   void onInit() {
     super.onInit();
@@ -18,7 +18,7 @@ class NotificationsController extends GetxController {
   }
 
   Future<void> fetchNotifications() async {
-    print("heyyyyyyyy fetch fetchNotification");
+    debugPrint("heyyyyyyyy fetch fetchNotification");
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Check if services exist in local storage
@@ -31,17 +31,14 @@ class NotificationsController extends GetxController {
     // Fetch new services from API
     isLoading(true);
 
-    final response = await RemoteServices()
-        .getNotifications();
-    print("@@@@@@@@@@ $response @@@@@@@@@@");
-    print("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
+    final response = await RemoteServices().getNotifications();
+    debugPrint("@@@@@@@@@@ $response @@@@@@@@@@");
+    debugPrint("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
     isLoading(false);
     if (response is List) {
       notifications.value = response;
 
-      await prefs.setString(
-          "cached_notifications", json.encode(response));
+      await prefs.setString("cached_notifications", json.encode(response));
     }
   }
-
 }

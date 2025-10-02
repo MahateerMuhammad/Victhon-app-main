@@ -29,23 +29,14 @@ class _SigninScreenState extends State<SigninScreen> {
   final formkey = GlobalKey<FormState>();
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+  void dispose() {
+    super.dispose();
+    authController.emailController.dispose();
+    authController.passwordController.dispose();
   }
-
-  // @override
-  // void dispose() {
-  //   // TODO: implement dispose
-  //   super.dispose();
-  //   authController.emailPhoneNumberController.dispose();
-  //   authController.passwordController.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-
     return Obx(
       () => Stack(
         children: [

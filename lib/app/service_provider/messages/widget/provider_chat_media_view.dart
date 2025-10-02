@@ -32,7 +32,7 @@ class _ProviderChatMediaViewState extends State<ProviderChatMediaView> {
         actions: [
           GestureDetector(
               onTap: () => Get.back(),
-              child: Icon(
+              child: const Icon(
                 Icons.close,
                 size: 30,
               )),

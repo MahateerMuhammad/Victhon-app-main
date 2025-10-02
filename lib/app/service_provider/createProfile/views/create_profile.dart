@@ -11,8 +11,6 @@ import 'package:Victhon/widget/custom_form_field.dart';
 import 'package:Victhon/widget/textwidget.dart';
 import '../../../../utils/functions.dart';
 import '../../../../widget/loader.dart';
-import 'selfie_capture_screen.dart';
-import 'selfie_verification_screen.dart';
 
 class ProviderCreateProfileScreen extends StatefulWidget {
   const ProviderCreateProfileScreen({
