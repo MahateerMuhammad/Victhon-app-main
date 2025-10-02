@@ -65,10 +65,25 @@ class RemoteServices {
     required String idToken,
     required String userType,
   }) async {
+    // Use mobile-specific endpoints for Flutter app
+    String endpoint = userType == "customer" 
+        ? ApiList.customerGoogleAuth 
+        : ApiList.serviceProviderGoogleAuth;
+    
+    print('[DEBUG] GoogleSignUp - userType: $userType');
+    print('[DEBUG] GoogleSignUp - endpoint: $endpoint');
+    print('[DEBUG] GoogleSignUp - idToken length: ${idToken.length}');
+    print('[DEBUG] GoogleSignUp - idToken preview: ${idToken.substring(0, 50)}...');
+    
     final response = await server.postRequest(
-        endPoint: ApiList.googleAuth + userType,
+        endPoint: endpoint,
         headers: AppServer.getAuthHeaders(),
         body: {"idToken": idToken});
+
+    print('[DEBUG] GoogleSignUp - Response Status: ${response.statusCode}');
+    print('[DEBUG] GoogleSignUp - Response Success: ${response.isSuccess}');
+    print('[DEBUG] GoogleSignUp - Response Data: ${response.data}');
+    print('[DEBUG] GoogleSignUp - Response Error: ${response.errorMessage}');
 
     return response;
   }

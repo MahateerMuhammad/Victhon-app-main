@@ -4,8 +4,8 @@ class ApiList {
   static const String socketUrl = "http://192.168.18.251:3000";
 
   static const login = "$baseUrl/auth/user/login?role=";
-  static const customerGoogleAuth = "$baseUrl/auth/google";
-  static const serviceProviderGoogleAuth = "$baseUrl/auth/google/callback/provider";
+  static const customerGoogleAuth = "$baseUrl/auth/google/mobile/customer";
+  static const serviceProviderGoogleAuth = "$baseUrl/auth/google/mobile/provider";
 
 
   static const signUp = "$baseUrl/auth/user/signup/initiate?role=";
