@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "808351711954",
+    "project_id": "victhon-e5bd4",
+    "storage_bucket": "victhon-e5bd4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808351711954:android:8146e48b27164ac125630b",
+        "android_client_info": {
+          "package_name": "com.example.victhon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgjaSINQAnMBM2MVnweddJgKCN9bNpwsg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
