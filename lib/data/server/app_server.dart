@@ -433,6 +433,14 @@ class AppServer {
     return headers;
   }
 
+  // Public method for endpoints that don't require authentication
+  static Map<String, String> getHttpHeadersPublic() {
+    Map<String, String> headers = Map<String, String>();
+    headers['Content-Type'] = 'application/json';
+    headers['Accept'] = "*/*";
+    return headers;
+  }
+
   static Map<String, String> getAuthHeaders() {
     Map<String, String> headers = Map<String, String>();
     // headers['x-api-key'] = ApiList.licenseCode.toString();
@@ -445,12 +453,31 @@ class AppServer {
 
   static Map<String, String> getHttpHeadersWithToken() {
     var token = box.read('token');
+    print("🔐 Getting token from storage: '$token'");
+    print("🔐 Token type: ${token.runtimeType}");
+    print("🔐 Token is null: ${token == null}");
+    print("🔐 Token is empty: ${token == ''}");
+    print("🔐 Token length: ${token?.toString().length}");
+    
+    // Check for whitespace or special characters
+    if (token != null) {
+      var tokenStr = token.toString();
+      print("🔐 Token starts with: '${tokenStr.substring(0, tokenStr.length < 20 ? tokenStr.length : 20)}'");
+      print("🔐 Token ends with: '${tokenStr.substring(tokenStr.length < 20 ? 0 : tokenStr.length - 20)}'");
+      print("🔐 Token has newlines: ${tokenStr.contains('\n')}");
+      print("🔐 Token has carriage returns: ${tokenStr.contains('\r')}");
+      print("🔐 Token has spaces: ${tokenStr.contains(' ')}");
+      print("🔐 Token trimmed length: ${tokenStr.trim().length}");
+      
+      // Use trimmed token
+      token = tokenStr.trim();
+    }
+    
     Map<String, String> headers = Map<String, String>();
     headers['Authorization'] = "Bearer $token";
-    // headers['x-api-key'] = ApiList.licenseCode.toString();
     headers['Content-Type'] = 'application/json';
-    // headers['Accept'] = "*/*";
-    // headers['Access-Control-Allow-Origin'] = "*";
+    
+    print("🔐 Final Authorization header: '${headers['Authorization']}'");
     return headers;
   }
 

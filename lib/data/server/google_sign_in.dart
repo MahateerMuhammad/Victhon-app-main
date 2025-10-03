@@ -72,7 +72,10 @@ Future<void> signInWithGoogle(String userType, String authType) async {
         } else {
           debugPrint('[DEBUG] User profile exists, logging in.');
           box.write("authStatus", "loggedIn");
-          box.write("userType", userType);
+          // Map frontend userType to storage userType for navigation
+          String storageUserType = userType == "provider" ? "serviceProvider" : userType;
+          box.write("userType", storageUserType);
+          debugPrint("💾 Google sign-in stored userType: '$storageUserType' (from frontend userType: '$userType')");
 
           if (userType == "customer") {
             Get.offAll(() => const CustomerBottomNavBar());

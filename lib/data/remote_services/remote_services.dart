@@ -35,12 +35,22 @@ class RemoteServices {
     required String password,
     required String userType,
   }) async {
+    print("🔐 SignUp - Frontend userType: '$userType'");
+    
+    // Map frontend userType to backend expected role
+    String backendRole = userType;
+    if (userType == "provider") {
+      backendRole = "serviceProvider";
+      print("🔄 SignUp role mapping: '$userType' -> '$backendRole'");
+    }
+    
     final response = await server.postRequest(
-        endPoint: ApiList.signUp + userType,
+        endPoint: ApiList.signUp + backendRole,  // Use mapped role in query parameter
         headers: AppServer.getAuthHeaders(),
         body: {
           "identifier": identifier,
           "password": password,
+          "role": backendRole,  // Use mapped role in body
         });
 
     return response;
@@ -51,12 +61,22 @@ class RemoteServices {
     required String password,
     required String userType,
   }) async {
+    print("🔐 Login - Frontend userType: '$userType'");
+    
+    // Map frontend userType to backend expected role
+    String backendRole = userType;
+    if (userType == "provider") {
+      backendRole = "serviceProvider";
+      print("🔄 Role mapping: '$userType' -> '$backendRole'");
+    }
+    
     final response = await server.postRequest(
-        endPoint: ApiList.signIn + userType,
+        endPoint: ApiList.signIn + backendRole,  // Use mapped role in query parameter
         headers: AppServer.getAuthHeaders(),
         body: {
           "identifier": identifier,
           "password": password,
+          "role": backendRole,  // Use mapped role in body
         });
 
     return response;
@@ -113,12 +133,22 @@ class RemoteServices {
     required String otp,
     required String userType,
   }) async {
+    print("🔐 ValidateSignUp - Frontend userType: '$userType'");
+    
+    // Map frontend userType to backend expected role
+    String backendRole = userType;
+    if (userType == "provider") {
+      backendRole = "serviceProvider";
+      print("🔄 ValidateSignUp role mapping: '$userType' -> '$backendRole'");
+    }
+    
     final response = await server.postRequest(
-        endPoint: ApiList.validateUserSignUp + userType,
+        endPoint: ApiList.validateUserSignUp + backendRole,  // Use mapped role in query parameter
         headers: AppServer.getAuthHeaders(),
         body: {
           "identifier": identifier,
           "otp": otp,
+          "role": backendRole,  // Use mapped role in body
         });
 
     return response;
@@ -871,17 +901,24 @@ class RemoteServices {
   }
 
   Future<dynamic> getAllBanks() async {
+    debugPrint("Fetching banks from: ${ApiList.getAllBanks}");
+    
+    // Use public headers since /banks/all endpoint doesn't require authentication
     final ApiResponse response = await server.getRequest(
       endPoint: ApiList.getAllBanks,
-      headers: AppServer.getHttpHeadersWithToken(),
+      headers: AppServer.getHttpHeadersPublic(),
     );
+
+    debugPrint("getAllBanks response: isSuccess=${response.isSuccess}, statusCode=${response.statusCode}");
+    debugPrint("getAllBanks response data: ${response.data}");
+    debugPrint("getAllBanks error message: ${response.errorMessage}");
 
     if (response.isSuccess) {
       final data = response.data;
-      debugPrint("object 222222222 $data");
-
+      debugPrint("Banks data received successfully: $data");
       return data;
     } else {
+      debugPrint("getAllBanks failed with status ${response.statusCode}: ${response.errorMessage}");
       return response;
     }
   }
@@ -905,19 +942,43 @@ class RemoteServices {
   Future<dynamic> addBankAccount({
     required String accountName,
     required String accountNumber,
-    required String bankName,
+    required String bankId,
+    required String bankCode,
     required bool isPrimaryAccount,
   }) async {
+    print("🏦 === ADD BANK ACCOUNT API CALL ===");
+    print("🏦 Account Name: '$accountName'");
+    print("🏦 Account Number: '$accountNumber'");
+    print("🏦 Bank ID: '$bankId'");
+    print("🏦 Bank Code: '$bankCode'");
+    print("🏦 Is Primary: $isPrimaryAccount");
+    print("🏦 Endpoint: ${ApiList.addBankAccount}");
+    
+    // Get headers and debug token
+    var headers = AppServer.getHttpHeadersWithToken();
+    print("🏦 Headers: $headers");
+    
+    // Prepare body and show what we're sending
+    // Try bankId first since bankCode didn't work
+    var requestBody = {
+      "accountName": accountName,
+      "accountNumber": accountNumber,
+      "bankId": bankId,  // Try bankId instead of bankCode
+      "isPrimary": isPrimaryAccount,
+    };
+    print("🏦 Request Body: $requestBody");
+    print("🏦 Available alternatives - Bank ID: '$bankId', Bank Code: '$bankCode'");
+    
     final response = await server.postRequest(
       endPoint: ApiList.addBankAccount,
-      headers: AppServer.getHttpHeadersWithToken(),
-      body: {
-        "accountName": accountName,
-        "accountNumber": accountNumber,
-        "bankName": bankName,
-        "isPrimary": isPrimaryAccount,
-      },
+      headers: headers,
+      body: requestBody,
     );
+
+    print("🏦 Response Status: ${response.statusCode}");
+    print("🏦 Response Success: ${response.isSuccess}");
+    print("🏦 Response Data: ${response.data}");
+    print("🏦 Response Error: ${response.errorMessage}");
 
     return response;
   }
@@ -931,5 +992,95 @@ class RemoteServices {
     );
 
     return response;
+  }
+
+  // Additional Bank CRUD operations
+  
+  Future<dynamic> createBank({
+    required String bankName,
+    required String bankCode,
+  }) async {
+    final response = await server.postRequest(
+      endPoint: ApiList.createBank,
+      headers: AppServer.getHttpHeadersWithToken(),
+      body: {
+        "bankName": bankName,
+        "bankCode": bankCode,
+      },
+    );
+
+    return response;
+  }
+
+  Future<dynamic> updateBank({
+    required String bankId,
+    required String bankName,
+    required String bankCode,
+  }) async {
+    final response = await server.putRequest(
+      endPoint: ApiList.updateBank + bankId,
+      headers: AppServer.getHttpHeadersWithToken(),
+      body: {
+        "bankName": bankName,
+        "bankCode": bankCode,
+      },
+    );
+
+    return response;
+  }
+
+  Future<dynamic> getBankById({
+    required String bankId,
+  }) async {
+    final ApiResponse response = await server.getRequest(
+      endPoint: ApiList.getBankById + bankId,
+      headers: AppServer.getHttpHeadersWithToken(),
+    );
+
+    if (response.isSuccess) {
+      final data = response.data;
+      debugPrint("Bank by ID: $data");
+      return data;
+    } else {
+      return response;
+    }
+  }
+
+  Future<dynamic> updateBankAccount({
+    required String accountId,
+    required String accountName,
+    required String accountNumber,
+    required String bankName,
+    required bool isPrimaryAccount,
+  }) async {
+    final response = await server.putRequest(
+      endPoint: ApiList.updateBankAccount + accountId,
+      headers: AppServer.getHttpHeadersWithToken(),
+      body: {
+        "accountName": accountName,
+        "accountNumber": accountNumber,
+        "bankName": bankName,
+        "isPrimary": isPrimaryAccount,
+      },
+    );
+
+    return response;
+  }
+
+  Future<dynamic> getBankAccountById({
+    required String accountId,
+  }) async {
+    final ApiResponse response = await server.getRequest(
+      endPoint: ApiList.getBankAccountById + accountId,
+      headers: AppServer.getHttpHeadersWithToken(),
+    );
+
+    if (response.isSuccess) {
+      final data = response.data;
+      debugPrint("Bank account by ID: $data");
+      return data;
+    } else {
+      return response;
+    }
   }
 }

@@ -1,4 +1,4 @@
-import 'package:Victhon/app/service_provider/createProfile/views/profile_upload_screen.dart';
+import 'package:Victhon/app/service_provider/createProfile/views/add_bank_details.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Victhon/app/customerApp/auth/widgets/country_dropdown.dart';
@@ -205,7 +205,8 @@ class _ProviderCreateProfileScreenState
                                     createProfileController.identifier =
                                         widget.identifier;
 
-                                    Get.to(() => const ProfileUploadScreen());
+                                    // Skip profile image upload and go directly to bank details
+                                    Get.to(() => AddBankDetails());
                                   }
                                 }
                               : () {},
