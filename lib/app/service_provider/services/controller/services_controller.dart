@@ -38,7 +38,12 @@ class ServicesController extends GetxController {
   final String country = "Nigeria";
 
   List<String> serviceLocation = [];
-  Map<String, dynamic> serviceAddress = {};
+  Map<String, dynamic> serviceAddress = {
+    "street": "Remote Service",
+    "city": "Remote Service",
+    "state": "Remote Service", 
+    "country": "Remote Service"
+  };
 
   RxList<File?> serviceImages = <File?>[].obs;
 

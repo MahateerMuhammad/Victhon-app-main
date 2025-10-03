@@ -201,10 +201,15 @@ class _ReviewServicesState extends State<ReviewServices> {
                                       ? {
                                           "street": street.value,
                                           "city": city.value,
-                                          "state": street.value,
+                                          "state": state.value,
                                           "country": country.value
                                         }
-                                      : servicesController.serviceAddress,
+                                      : {
+                                          "street": "Remote Service",
+                                          "city": "Remote Service",
+                                          "state": "Remote Service",
+                                          "country": "Remote Service"
+                                        },
                               context: context,
                             );
                           },
