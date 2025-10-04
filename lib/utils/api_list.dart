@@ -1,6 +1,6 @@
 class ApiList {
-  static const baseUrl = "http://192.168.18.251:3000";
-  static const String socketUrl = "http://192.168.18.251:3000";
+  static const baseUrl = "http://192.168.100.191:3000";
+  static const String socketUrl = "http://192.168.100.191:3000";
 
   static const login = "$baseUrl/auth/user/login?role=";
   static const customerGoogleAuth = "$baseUrl/auth/google/mobile/customer";
@@ -74,15 +74,18 @@ class ApiList {
   //Banks
   static const getAllBanks = "$baseUrl/banks/all";
   static const getBankAccount = "$baseUrl/banks/account/all";
-  static const addBankAccount = "$baseUrl/banks/acount/add";  // Note: typo in backend API
+  static const addBankAccount =
+      "$baseUrl/banks/acount/add"; // Note: typo in backend API
   static const deleteBankAccount = "$baseUrl/banks/account/";
-  
+
   // Additional bank CRUD operations
   static const createBank = "$baseUrl/banks/create";
-  static const updateBank = "$baseUrl/banks/update/";  // append ID
-  static const getBankById = "$baseUrl/banks/get/";    // append ID
-  static const updateBankAccount = "$baseUrl/banks/account/";  // append accountId  
-  static const getBankAccountById = "$baseUrl/banks/account/";  // append accountId
+  static const updateBank = "$baseUrl/banks/update/"; // append ID
+  static const getBankById = "$baseUrl/banks/get/"; // append ID
+  static const updateBankAccount =
+      "$baseUrl/banks/account/"; // append accountId
+  static const getBankAccountById =
+      "$baseUrl/banks/account/"; // append accountId
 
   //ratings and review
   static const getRatingsAndReviews = "$baseUrl/ratings/serviceProvider";
