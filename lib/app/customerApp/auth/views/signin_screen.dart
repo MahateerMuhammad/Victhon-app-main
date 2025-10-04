@@ -25,14 +25,13 @@ class SigninScreen extends StatefulWidget {
 }
 
 class _SigninScreenState extends State<SigninScreen> {
-  final authController = Get.put(AuthController());
+  final authController = Get.put(AuthController(), permanent: true);
   final formkey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     super.dispose();
-    authController.emailController.dispose();
-    authController.passwordController.dispose();
+    // Do not dispose controllers owned by GetX AuthController here
   }
 
   @override

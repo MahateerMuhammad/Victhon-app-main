@@ -229,28 +229,58 @@ class ServiceProviderProfileController extends GetxController {
     // Check if services exist in local storage
     String? savedNotifiPreference = prefs.getString("cached_notifiPreference");
     if (savedNotifiPreference != null) {
-      notifiPreference.value =
-          Map<String, dynamic>.from(json.decode(savedNotifiPreference));
-      bookingRequests.value = notifiPreference["bookingRequests"];
-      messages.value = notifiPreference["messages"];
-      payments.value = notifiPreference["payments"];
-      customerReviews.value = notifiPreference["customerReviews"];
+      try {
+        final cachedData = Map<String, dynamic>.from(json.decode(savedNotifiPreference));
+        notifiPreference.value = cachedData;
+        
+        // Use null-safe access with fallback to false for cached data
+        bookingRequests.value = cachedData["bookingRequests"] as bool? ?? false;
+        messages.value = cachedData["newMessages"] as bool? ?? cachedData["messages"] as bool? ?? false;
+        payments.value = cachedData["paymentReceived"] as bool? ?? cachedData["payments"] as bool? ?? false;
+        customerReviews.value = cachedData["customerReviews"] as bool? ?? false;
+      } catch (e) {
+        debugPrint("Error loading cached notification preferences: $e");
+        // Set defaults if cached data is corrupted
+        bookingRequests.value = false;
+        messages.value = false;
+        payments.value = false;
+        customerReviews.value = false;
+      }
     }
 
     // Fetch new services from API
-    final response = await RemoteServices().getNotifiPreference();
-    debugPrint("@@@@@@@@@@ ${response["data"]} @@@@@@@@@@");
-    debugPrint("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
+    try {
+      final response = await RemoteServices().getNotifiPreference();
+      debugPrint("@@@@@@@@@@ ${response?["data"]} @@@@@@@@@@");
+      debugPrint("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
 
-    if (response is Map<String, dynamic>) {
-      notifiPreference.value = response["data"];
-      bookingRequests.value = notifiPreference["bookingRequests"];
-      messages.value = notifiPreference["messages"];
-      payments.value = notifiPreference["payments"];
-      customerReviews.value = notifiPreference["customerReviews"];
+      if (response is Map<String, dynamic> && response["data"] != null) {
+      final data = response["data"] as Map<String, dynamic>;
+      notifiPreference.value = data;
+      
+      // Use null-safe access with backend property names and default false values
+      bookingRequests.value = data["bookingRequests"] as bool? ?? false;
+      messages.value = data["newMessages"] as bool? ?? data["messages"] as bool? ?? false;
+      payments.value = data["paymentReceived"] as bool? ?? data["payments"] as bool? ?? false;
+      customerReviews.value = data["customerReviews"] as bool? ?? false;
 
-      await prefs.setString(
-          "cached_notifiPreference", json.encode(response["data"]));
+        await prefs.setString("cached_notifiPreference", json.encode(data));
+      } else {
+        // Set default false values if no preferences found
+        bookingRequests.value = false;
+        messages.value = false;
+        payments.value = false;
+        customerReviews.value = false;
+      }
+    } catch (e) {
+      debugPrint("Error fetching notification preferences: $e");
+      // Set default false values on error (e.g., 403 Forbidden for customers)
+      bookingRequests.value = false;
+      messages.value = false;
+      payments.value = false;
+      customerReviews.value = false;
+      // Re-throw the error so the UI can handle it
+      rethrow;
     }
   }
 
@@ -261,6 +291,23 @@ class ServiceProviderProfileController extends GetxController {
     required bool customerReviewsValue,
   }) async {
     isLoading(true);
+    
+    // First check if preferences exist (getNotifiPreference returns null when no actual preferences exist)
+    final getResponse = await RemoteServices().getNotifiPreference();
+    
+    // If preferences don't exist, create them first with false defaults
+    if (getResponse == null) {
+      debugPrint("Preferences not found, creating default false preferences...");
+      final createResponse = await RemoteServices().createNotifiPreference();
+      if (createResponse == null) {
+        isLoading(false);
+        debugPrint("Failed to create notification preferences");
+        return;
+      }
+      debugPrint("Default false preferences created successfully");
+    }
+    
+    // Now update the preferences
     ApiResponse response = await RemoteServices().updateNotifiPreference(
       bookingRequests: bookingRequestsValue,
       messages: messagesValue,
@@ -274,10 +321,12 @@ class ServiceProviderProfileController extends GetxController {
 
       final dynamic responseData = response.data["data"];
       debugPrint("responseData Data: $responseData");
-      bookingRequests.value = responseData["bookingRequests"];
-      messages.value = responseData["messages"];
-      payments.value = responseData["payments"];
-      customerReviews.value = responseData["customerReviews"];
+      
+      // Handle property name differences between frontend and backend
+      bookingRequests.value = responseData["bookingRequests"] as bool? ?? false;
+      messages.value = responseData["newMessages"] as bool? ?? responseData["messages"] as bool? ?? false;
+      payments.value = responseData["paymentReceived"] as bool? ?? responseData["payments"] as bool? ?? false;
+      customerReviews.value = responseData["customerReviews"] as bool? ?? false;
 
       // Get.snackbar(
       //   "Success",

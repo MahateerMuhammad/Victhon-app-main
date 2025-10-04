@@ -158,9 +158,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 );
                               },
                               child: buildServiceItem(
-                                image: homeController.services[index]
-                                        ["imageUrls"][0] ??
-                                    AppImages.onboardingImages1,
+                                image: (homeController.services[index]
+                                            ["imageUrls"] != null &&
+                                        homeController.services[index]
+                                                ["imageUrls"].isNotEmpty)
+                                    ? homeController.services[index]
+                                        ["imageUrls"][0]
+                                    : AppImages.onboardingImages1,
                                 title: homeController.services[index]
                                     ["serviceName"],
                                 location: homeController.services[index]

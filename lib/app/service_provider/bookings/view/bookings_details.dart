@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:Victhon/app/service_provider/bookings/controller/bookings_controller.dart';
-import 'package:Victhon/app/service_provider/messages/view/messages_view.dart';
+import 'package:Victhon/app/service_provider/messages/view/chat_screen_view.dart';
 import 'package:Victhon/config/theme/app_color.dart';
 import 'package:Victhon/app/service_provider/bookings/widget/cancel_dialog.dart';
 import 'package:Victhon/utils/functions.dart';
@@ -333,9 +333,21 @@ class BookingDetailsScreen extends StatelessWidget {
             height: 45,
             child: OutlinedButton.icon(
               onPressed: () {
-                Get.back();
+                // Navigate directly to chat screen with this specific customer
+                // Create a mock conversation object for the chat screen
+                final customerConversation = {
+                  "_id": null, // Will be a new conversation if no existing one
+                  "otherUser": {
+                    "userId": bookingDetails["customerId"]["_id"],
+                    "fullName": bookingDetails["customerId"]["fullName"],
+                    "imageUrl": bookingDetails["customerId"]["imageUrl"] ?? "",
+                  },
+                  "messages": [], // Empty messages array for new conversation
+                };
 
-                Get.to(() => ServiceProviderMessagesScreen());
+                Get.to(() => ServiceProviderChatScreen(
+                  message: customerConversation,
+                ));
               },
               icon: const Icon(
                 CupertinoIcons.chat_bubble_text,

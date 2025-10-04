@@ -225,7 +225,10 @@ class AuthController extends GetxController {
       isFormFilled.value = false;
 
       box.write("authStatus", "loggedIn");
-      box.write("userType", userType);
+      // Map frontend userType to storage userType for navigation
+      String storageUserType = userType == "provider" ? "serviceProvider" : userType;
+      box.write("userType", storageUserType);
+      debugPrint("💾 Stored userType: '$storageUserType' (from frontend userType: '$userType')");
       identifierController.clear();
       passwordController.clear();
       if (userType == "customer") {
@@ -268,7 +271,34 @@ class AuthController extends GetxController {
       final dynamic responseData = response.data;
 
       debugPrint("Response Data: $responseData");
-      box.write('token', responseData["access_token"]);
+      debugPrint("🔐 Response type: ${responseData.runtimeType}");
+      debugPrint("🔐 Available keys: ${responseData is Map ? responseData.keys : 'N/A'}");
+      
+      // Try different possible token field names
+      var accessToken = responseData["access_token"] ?? 
+                       responseData["token"] ?? 
+                       responseData["accessToken"] ?? 
+                       responseData["authToken"];
+      
+      debugPrint("🔐 Access token from response: '$accessToken'");
+      
+      if (accessToken != null && accessToken.toString().isNotEmpty) {
+        debugPrint("🔐 Saving token to storage");
+        box.write('token', accessToken);
+        
+        // Verify token was saved
+        var savedToken = box.read('token');
+        debugPrint("🔐 Token after saving: '$savedToken'");
+        debugPrint("🔐 Token verification: ${savedToken == accessToken}");
+      } else {
+        debugPrint("❌ No valid token found in response!");
+        debugPrint("🔐 Checking individual fields:");
+        debugPrint("  - access_token: '${responseData["access_token"]}'");
+        debugPrint("  - token: '${responseData["token"]}'");
+        debugPrint("  - accessToken: '${responseData["accessToken"]}'");
+        debugPrint("  - authToken: '${responseData["authToken"]}'");
+      }
+      
       pinController.clear();
       identifierController.clear();
       fullNameController.clear();
@@ -461,9 +491,12 @@ class AuthController extends GetxController {
             AppColor.success);
       } else {
         box.write("authStatus", "loggedIn");
-        box.write("userType", userType);
+        // Map frontend userType to storage userType for navigation
+        String storageUserType = userType == "provider" ? "serviceProvider" : userType;
+        box.write("userType", storageUserType);
+        debugPrint("💾 Google Sign-in stored userType: '$storageUserType' (from frontend userType: '$userType')");
         Get.off(() => WelcomeMessageScreen(
-              userType: userType,
+              userType: userType,  // Keep original userType for UI display
               userName: fullName,
             ));
       }

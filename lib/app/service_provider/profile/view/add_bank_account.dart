@@ -93,7 +93,8 @@ class _AddBankAccountState extends State<AddBankAccount> {
                           bankAccountController.addBankAccount(
                             bankAccountController.accountNameController.text,
                             bankAccountController.accountNumberController.text,
-                            createProfileController.selectedBank["name"],
+                            createProfileController.selectedBank["_id"],
+                            createProfileController.selectedBank["bankCode"],
                             false,
                             context,
                           );

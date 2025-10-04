@@ -24,7 +24,7 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final authController = Get.put(AuthController());
+  final authController = Get.find<AuthController>();
   final formkey = GlobalKey<FormState>();
 
   bool containsUppercase = false;

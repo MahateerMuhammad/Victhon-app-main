@@ -40,23 +40,36 @@ class ProviderCreateProfileController extends GetxController {
   }
 
   void updateBankAccountFormFilled() {
+    print("=== BANK FORM VALIDATION DEBUG ===");
+    print("Account Number: '${accountNumberController.text}' (isEmpty: ${accountNumberController.text.isEmpty})");
+    print("Account Name: '${accountNameController.text}' (isEmpty: ${accountNameController.text.isEmpty})");
+    print("Selected Bank: $selectedBank (isEmpty: ${selectedBank.isEmpty})");
+    print("Selected Bank Name: ${selectedBank.isNotEmpty ? selectedBank['bankName'] : 'No bank selected'}");
+    
     isFormFilled.value = accountNumberController.text.isNotEmpty &&
         accountNameController.text.isNotEmpty &&
         selectedBank.isNotEmpty;
+    
+    print("Form is filled: ${isFormFilled.value}");
+    print("=== END BANK FORM VALIDATION DEBUG ===");
   }
 
   @override
   void onInit() {
+    print("🎯 CONTROLLER onInit() CALLED");
     super.onInit();
     fullNameController.addListener(updateCreateProfileFormFilled);
     businessNameController.addListener(updateCreateProfileFormFilled);
     ninController.addListener(updateCreateProfileFormFilled);
 
+    print("🎯 About to call fetchAllBanks()");
     fetchAllBanks();
+    print("🎯 fetchAllBanks() call completed");
 
     accountNumberController.addListener(updateBankAccountFormFilled);
     accountNameController.addListener(updateBankAccountFormFilled);
     ever(selectedBank, (_) => updateBankAccountFormFilled());
+    print("🎯 Controller onInit() finished");
   }
 
   createServiceProviderProfile(
@@ -70,6 +83,10 @@ class ProviderCreateProfileController extends GetxController {
     String userType,
     String profileImage,
   ) async {
+    print("🔐 About to create service provider profile");
+    var currentToken = box.read('token');
+    print("🔐 Current token before API call: '$currentToken'");
+    
     isLoading(true);
     final ApiResponse response =
         await RemoteServices().createServiceProviderProfile(
@@ -89,7 +106,10 @@ class ProviderCreateProfileController extends GetxController {
       final dynamic responseData = response.data;
 
       print("Response Data: $responseData");
-      box.write("userType", userType);
+      // Map frontend userType to storage userType for navigation
+      String storageUserType = userType == "provider" ? "serviceProvider" : userType;
+      box.write("userType", storageUserType);
+      debugPrint("💾 Provider profile stored userType: '$storageUserType' (from frontend userType: '$userType')");
       emailController.clear();
       phoneNumberController.clear();
       businessNameController.clear();
@@ -98,10 +118,12 @@ class ProviderCreateProfileController extends GetxController {
       country = '';
       state = '';
       isFormFilled.value = false;
+      // Try bank ID first, if that fails we might need bank code
       addBankAccount(
         accountNameController.text,
         accountNumberController.text,
-        selectedBank["name"],
+        selectedBank["_id"], // Use bank ID instead of name
+        selectedBank["bankCode"], // Also pass bank code as fallback
         true,
       );
 
@@ -222,46 +244,118 @@ class ProviderCreateProfileController extends GetxController {
   }
 
   Future<void> fetchAllBanks() async {
-    print("heyyyyyyyy fetch accountDetails");
+    print("🚀 FETCHALLBANKS METHOD CALLED - START");
+    print("=== FETCHING BANKS DEBUG ===");
+    print("Starting to fetch bank details...");
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Check if services exist in local storage
     String? savedAccountDetails = prefs.getString("cached_bankDetails");
     if (savedAccountDetails != null) {
+      print("Found cached bank details");
       bankDetails.value =
           List<dynamic>.from(json.decode(savedAccountDetails)).toList();
+      print("Loaded ${bankDetails.length} banks from cache");
+    } else {
+      print("No cached bank details found");
     }
 
     // Fetch new services from API
-    final response = await RemoteServices().getAllBanks();
-    print("@@@@@@@@@@ ${response} @@@@@@@@@@");
-    print("@@@@@@@@@@ ${response.runtimeType} @@@@@@@@@@");
+    print("Fetching banks from API...");
+    try {
+      final response = await RemoteServices().getAllBanks();
+      print("API Response: $response");
+      print("Response Type: ${response.runtimeType}");
+      print("Response toString: ${response.toString()}");
 
-    if (response is ApiResponse && response.isSuccess) {
-      final data = response.data;
-      if (data is Map<String, dynamic> && data["data"] != null) {
-        bankDetails.value = data["data"];
-        await prefs.setString(
-            "cached_bankDetails", json.encode(data["data"]));
+      if (response is ApiResponse) {
+        print("Response is ApiResponse - Success: ${response.isSuccess}");
+        if (response.isSuccess) {
+          final data = response.data;
+          print("API Success - Data: $data");
+          print("Data type: ${data.runtimeType}");
+          
+          if (data is List) {
+            // Direct array response
+            bankDetails.value = data;
+            print("Updated bankDetails with ${bankDetails.length} banks from API (direct array)");
+          } else if (data is Map<String, dynamic> && data["data"] != null) {
+            // Wrapped in data field
+            bankDetails.value = data["data"];
+            print("Updated bankDetails with ${bankDetails.length} banks from API (wrapped in data)");
+          } else {
+            print("Unexpected data format: $data");
+          }
+        } else {
+          print("API Response failed: ${response.errorMessage}");
+        }
+      } else if (response is List) {
+        // Direct array response from RemoteServices
+        print("Direct array response from RemoteServices");
+        bankDetails.value = response;
+        print("Updated bankDetails with ${bankDetails.length} banks (direct)");
+      } else if (response is Map<String, dynamic>) {
+        print("Map response format");
+        if (response["data"] != null) {
+          bankDetails.value = response["data"];
+          print("Updated bankDetails with ${bankDetails.length} banks (from map data)");
+        } else {
+          print("Map response without data field: $response");
+        }
+      } else {
+        print("Unexpected response type: ${response.runtimeType}");
+        print("Response content: $response");
       }
-    } else if (response is Map<String, dynamic>) {
-      bankDetails.value = response["data"];
-      await prefs.setString(
-          "cached_bankDetails", json.encode(response["data"]));
+      
+      if (bankDetails.isNotEmpty) {
+        print("Final bankDetails count: ${bankDetails.length}");
+        for (int i = 0; i < bankDetails.length && i < 3; i++) {
+          print("Bank $i: ${bankDetails[i]}");
+        }
+        await prefs.setString("cached_bankDetails", json.encode(bankDetails));
+        print("Saved bank details to cache");
+      } else {
+        print("No banks loaded - bankDetails is empty!");
+      }
+    } catch (e) {
+      print("Error fetching banks: $e");
+    }
+    print("=== END FETCHING BANKS DEBUG ===");
+  }
+
+  // Simple test method to debug banks API
+  void testBanksApi() async {
+    print("🧪 TESTING BANKS API DIRECTLY");
+    try {
+      final response = await RemoteServices().getAllBanks();
+      print("🧪 Direct API test response: $response");
+      print("🧪 Response type: ${response.runtimeType}");
+    } catch (e) {
+      print("🧪 API test error: $e");
     }
   }
 
   addBankAccount(
     String accountName,
     String accountNumber,
-    String bankName,
+    String bankId,
+    String bankCode,
     bool isPrimaryAccount,
   ) async {
+    print("=== ADD BANK ACCOUNT DEBUG ===");
+    print("Account Name: '$accountName'");
+    print("Account Number: '$accountNumber'");
+    print("Bank ID: '$bankId'");
+    print("Bank Code: '$bankCode'");
+    print("Is Primary Account: $isPrimaryAccount");
+    print("Selected Bank Details: $selectedBank");
+    
     isLoading(true);
     final ApiResponse response = await RemoteServices().addBankAccount(
       accountName: accountName,
       accountNumber: accountNumber,
-      bankName: bankName,
+      bankId: bankId,
+      bankCode: bankCode,
       isPrimaryAccount: isPrimaryAccount,
     );
     isLoading(false);
@@ -288,14 +382,25 @@ class ProviderCreateProfileController extends GetxController {
       update();
     } else {
       print("--------- $response");
+      print("Response Status Code: ${response.statusCode}");
+      print("Response Error: ${response.errorMessage}");
 
       isLoading(false);
-      final errorMessage = response.errorMessage ?? "An error occurred";
-      // Future.delayed(const Duration(milliseconds: 10), () {
+      
+      // Handle authentication errors specifically
+      String errorMessage;
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        errorMessage = "Your session has expired. Please sign up again to continue.";
+        // Optionally navigate back to login/signup
+        // Get.offAllNamed('/signup');
+      } else if (response.statusCode == 0) {
+        errorMessage = "No internet connection. Please check your network and try again.";
+      } else {
+        errorMessage = response.errorMessage ?? "Failed to add bank account. Please try again.";
+      }
+      
       customSnackbar("ERROR".tr, errorMessage, AppColor.error);
-
       update();
-      // });
     }
   }
 }

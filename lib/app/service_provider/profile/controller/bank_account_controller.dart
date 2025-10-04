@@ -73,7 +73,8 @@ class BankAccountController extends GetxController {
   addBankAccount(
     String accountName,
     String accountNumber,
-    String bankName,
+    String bankId,
+    String bankCode,
     bool isPrimaryAccount,
     BuildContext context,
   ) async {
@@ -81,7 +82,8 @@ class BankAccountController extends GetxController {
     final ApiResponse response = await RemoteServices().addBankAccount(
       accountName: accountName,
       accountNumber: accountNumber,
-      bankName: bankName,
+      bankId: bankId,
+      bankCode: bankCode,
       isPrimaryAccount: isPrimaryAccount,
     );
     isLoading(false);

@@ -18,6 +18,12 @@ class _BankNameTextfieldState extends State<BankNameTextfield> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        print("=== BANK NAME TEXTFIELD TAPPED ===");
+        print("Current selected bank: ${createProfileController.selectedBank}");
+        
+        // Test API directly for debugging
+        createProfileController.testBanksApi();
+        
         showSelectBankDialog(context);
       },
       child: Container(
@@ -38,7 +44,7 @@ class _BankNameTextfieldState extends State<BankNameTextfield> {
                       radius: 20,
                       backgroundColor: Colors.grey.shade300,
                       child: TextWidget(
-                        text: createProfileController.selectedBank['name']
+                        text: createProfileController.selectedBank['bankName']
                             .toString()
                             .substring(0, 1),
                       ),
@@ -59,7 +65,7 @@ class _BankNameTextfieldState extends State<BankNameTextfield> {
                       color: Colors.grey,
                     )
                   : TextWidget(
-                      text: createProfileController.selectedBank["name"],
+                      text: createProfileController.selectedBank["bankName"],
                     ),
               const Spacer(),
               const Icon(
@@ -75,6 +81,17 @@ class _BankNameTextfieldState extends State<BankNameTextfield> {
 }
 
 void showSelectBankDialog(BuildContext context) {
+  print("=== OPENING BANK SELECTION DIALOG ===");
+  final createProfileController = Get.find<ProviderCreateProfileController>();
+  print("Available banks when opening dialog: ${createProfileController.bankDetails.length}");
+  print("Current selected bank: ${createProfileController.selectedBank}");
+  
+  // If no banks are loaded, try to fetch them again
+  if (createProfileController.bankDetails.isEmpty) {
+    print("⚠️ No banks available - triggering fetchAllBanks again");
+    createProfileController.fetchAllBanks();
+  }
+  
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -102,10 +119,23 @@ class _SelectBankDialogState extends State<SelectBankDialog> {
 
   @override
   Widget build(BuildContext context) {
+    print("=== BANK DIALOG BUILD DEBUG ===");
+    print("Total banks available: ${createProfileController.bankDetails.length}");
+    print("Search query: '$searchQuery'");
+    
     List<dynamic> filteredBanks = createProfileController.bankDetails
         .where((bank) =>
-            bank['name']!.toLowerCase().contains(searchQuery.toLowerCase()))
+            bank['bankName']!.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
+    
+    print("Filtered banks count: ${filteredBanks.length}");
+    if (filteredBanks.isNotEmpty) {
+      print("First few filtered banks:");
+      for (int i = 0; i < filteredBanks.length && i < 3; i++) {
+        print("  Bank $i: ${filteredBanks[i]['bankName']}");
+      }
+    }
+    print("=== END BANK DIALOG BUILD DEBUG ===");
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
@@ -197,7 +227,7 @@ class _SelectBankDialogState extends State<SelectBankDialog> {
                     radius: 20,
                     backgroundColor: Colors.grey.shade300,
                     child: TextWidget(
-                      text: filteredBanks[index]['name']
+                      text: filteredBanks[index]['bankName']
                           .toString()
                           .substring(0, 1),
                     ),
@@ -210,16 +240,23 @@ class _SelectBankDialogState extends State<SelectBankDialog> {
                     // ),
                   ),
                   title: Text(
-                    filteredBanks[index]['name']!,
+                    filteredBanks[index]['bankName']!,
                     style: const TextStyle(fontSize: 16),
                   ),
                   onTap: () {
-                    // Handle bank selection
-                    print("object: ${filteredBanks[index]}");
+                    // Enhanced debug prints for bank selection
+                    print("=== BANK SELECTION DEBUG ===");
+                    print("Selected Bank Index: $index");
+                    print("Selected Bank Object: ${filteredBanks[index]}");
+                    print("Bank Name: ${filteredBanks[index]['bankName']}");
+                    print("Bank Code: ${filteredBanks[index]['bankCode'] ?? 'No code'}");
+                    
                     createProfileController.selectedBank.value =
                         filteredBanks[index];
-                    print(
-                        "Selected Bank: ${createProfileController.selectedBank}");
+                    
+                    print("Controller selectedBank after assignment: ${createProfileController.selectedBank}");
+                    print("Selected Bank Name from Controller: ${createProfileController.selectedBank['bankName']}");
+                    print("=== END BANK SELECTION DEBUG ===");
 
                     Navigator.pop(context, filteredBanks[index]);
                   },
