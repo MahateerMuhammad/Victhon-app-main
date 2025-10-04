@@ -9,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../data/remote_services/network_service.dart';
 import '../../../../widget/chat_icon_widget.dart';
-import '../../../service_provider/messages/widget/provider_chat_media_view.dart';
 import '../widget/chat_media_view.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -247,7 +246,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               filled: true,
                               fillColor: AppColor.primaryCardColor,
                               contentPadding:
-                                  EdgeInsets.fromLTRB(16, 8, 16, 30),
+                                  const EdgeInsets.fromLTRB(16, 8, 16, 30),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide.none,

@@ -79,11 +79,11 @@ class EarningsView extends StatelessWidget {
                       )
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   AppPrimaryButton(
                     buttonText: "Withdraw",
                     onPressed: () {
-                      Get.to(() => WithdrawEarningsScreen());
+                      Get.to(() => const WithdrawEarningsScreen());
                     },
                     buttonColor: AppColor.whiteColor,
                     textColor: AppColor.primaryColor.shade400,
@@ -134,7 +134,6 @@ class EarningsView extends StatelessWidget {
                     text: "Loading transactions... Please wait",
                   ),
                 );
-                ;
               } else {
                 if (earningsController.transactionDetails.isEmpty) {
                   return const Expanded(

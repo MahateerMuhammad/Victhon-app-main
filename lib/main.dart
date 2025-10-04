@@ -18,7 +18,7 @@ final box = GetStorage();
 FirebaseMessaging messaging = FirebaseMessaging.instance;
 late SharedPreferences prefs;
 
-void main() async {
+Future<void> main() async {
   debugPrint('DEBUG: Starting main() function...');
 
   try {
