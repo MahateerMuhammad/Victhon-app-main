@@ -9,7 +9,7 @@ import '../../../../widget/textwidget.dart';
 import '../controller/service_provider_profile_controller.dart';
 
 class ConfirmTransactionPin extends StatefulWidget {
-  ConfirmTransactionPin({super.key});
+  const ConfirmTransactionPin({super.key});
 
   @override
   State<ConfirmTransactionPin> createState() => _ConfirmTransactionPinState();

@@ -100,7 +100,8 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                         Text(
                           providerProfileController.profileDetails["email"],
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 14, color: Colors.grey),
                         ),
 
                         const SizedBox(height: 20),

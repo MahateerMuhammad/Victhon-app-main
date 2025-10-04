@@ -10,7 +10,7 @@ import '../../../../widget/textwidget.dart';
 import '../controller/service_provider_profile_controller.dart';
 
 class CreateTransactionPin extends StatefulWidget {
-  CreateTransactionPin({super.key});
+  const CreateTransactionPin({super.key});
 
   @override
   State<CreateTransactionPin> createState() => _CreateTransactionPinState();
@@ -18,7 +18,6 @@ class CreateTransactionPin extends StatefulWidget {
 
 class _CreateTransactionPinState extends State<CreateTransactionPin> {
   final providerProfileController = Get.put(ServiceProviderProfileController());
-
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +90,7 @@ class _CreateTransactionPinState extends State<CreateTransactionPin> {
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  onChanged: (value) => setState(() {
-
-                  }),
+                  onChanged: (value) => setState(() {}),
                 ),
               ),
               const SizedBox(
@@ -107,7 +104,7 @@ class _CreateTransactionPinState extends State<CreateTransactionPin> {
                 onPressed: providerProfileController.pinController.length < 4
                     ? () {}
                     : () {
-                        Get.to(() => ConfirmTransactionPin());
+                        Get.to(() => const ConfirmTransactionPin());
                       },
               )
             ],

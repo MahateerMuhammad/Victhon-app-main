@@ -36,7 +36,7 @@ class _ServiceProviderEditProfileState
         // profileImage = _selectedImage;
       });
 
-      print("object ********* ${_selectedImage}");
+      debugPrint("object ********* $_selectedImage");
     }
   }
 

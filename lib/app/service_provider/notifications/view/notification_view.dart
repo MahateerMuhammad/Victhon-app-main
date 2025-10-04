@@ -77,6 +77,7 @@ class NotificationTile extends StatelessWidget {
   final String? senderImageUrl;
 
   const NotificationTile({
+    super.key,
     required this.title,
     required this.subtitle,
     required this.type,

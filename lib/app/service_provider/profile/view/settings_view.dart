@@ -79,7 +79,7 @@ class SettingsScreen extends StatelessWidget {
                     LucideIcons.bell,
                     "Notification Settings",
                     () {
-                      Get.to(() => NotificationSettings());
+                      Get.to(() => const NotificationSettings());
                     },
                   ),
                 ]),
@@ -108,7 +108,7 @@ class SettingsScreen extends StatelessWidget {
                     LucideIcons.headphones,
                     "Contact Us",
                     () {
-                      Get.to(() => ContactUs());
+                      Get.to(() => const ContactUs());
                     },
                   ),
                 ]),

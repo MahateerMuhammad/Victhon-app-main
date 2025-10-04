@@ -276,13 +276,13 @@ class _AddServiceStage3State extends State<AddServiceStage3> {
                       onPressed: () {
                         Get.back();
                       },
-                    
                       textColor: AppColor.primaryColor,
                       borderColor: AppColor.primaryColor,
                     ),
                   ),
-                const SizedBox(width: 16,),
-
+                  const SizedBox(
+                    width: 16,
+                  ),
                   Expanded(
                     child: AppPrimaryButton(
                       buttonText: "Next",
@@ -301,7 +301,6 @@ class _AddServiceStage3State extends State<AddServiceStage3> {
                           Get.to(() => AddServiceStage4());
                         }
                       },
-                    
                     ),
                   )
                 ],

@@ -55,7 +55,7 @@ class _TransactionSettingsState extends State<TransactionSettings> {
                           color: AppColor.primaryColor),
                       title: const Text(
                         "Create PIN",
-                        style: const TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16),
                       ),
                       trailing: Icon(
                         Icons.arrow_forward_ios,
@@ -63,7 +63,7 @@ class _TransactionSettingsState extends State<TransactionSettings> {
                         color: AppColor.blackColor.withOpacity(0.8),
                       ),
                       onTap: () {
-                        Get.to(() => CreateTransactionPin());
+                        Get.to(() => const CreateTransactionPin());
                       }, // Implement navigation here
                     ),
                     ListTile(

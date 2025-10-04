@@ -113,7 +113,7 @@ Future<void> main() async {
     runApp(
       DevicePreview(
         enabled: false,
-        builder: (context) => MyApp(),
+        builder: (context) => const MyApp(),
       ),
     );
     debugPrint('DEBUG: App started successfully');
@@ -274,7 +274,7 @@ class MyApp extends StatelessWidget {
             debugPrint('ERROR: Failed to build GetMaterialApp: $e');
             debugPrint('STACK TRACE: $stackTrace');
             // Return a basic MaterialApp as fallback
-            return MaterialApp(
+            return const MaterialApp(
               title: 'Victhon',
               home: Scaffold(
                 body: Center(

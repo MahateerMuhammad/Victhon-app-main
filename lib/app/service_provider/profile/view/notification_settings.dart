@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import '../../../../config/theme/app_color.dart';
 import '../../../../widget/loader.dart';
 import '../../../../widget/textwidget.dart';
@@ -25,7 +24,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
       _checkUserRole();
     });
   }
-  
+
   Future<void> _checkUserRole() async {
     try {
       // This will fail with 403 if user is not a service provider
@@ -43,30 +42,30 @@ class _NotificationSettingsState extends State<NotificationSettings> {
       }
     }
   }
-  
+
   // Create the list dynamically based on current controller values
   List<Map> get notificationList => [
-    {
-      "icon": Icons.date_range_outlined,
-      "text": "Booking Requests",
-      "select": providerProfileController.bookingRequests.value,
-    },
-    {
-      "icon": CupertinoIcons.chat_bubble_text,
-      "text": "New Messages",
-      "select": providerProfileController.messages.value,
-    },
-    {
-      "icon": Icons.payment_outlined,
-      "text": "Payment Received",
-      "select": providerProfileController.payments.value,
-    },
-    {
-      "icon": Icons.star_border_outlined,
-      "text": "Customer Reviews",
-      "select": providerProfileController.customerReviews.value,
-    },
-  ];
+        {
+          "icon": Icons.date_range_outlined,
+          "text": "Booking Requests",
+          "select": providerProfileController.bookingRequests.value,
+        },
+        {
+          "icon": CupertinoIcons.chat_bubble_text,
+          "text": "New Messages",
+          "select": providerProfileController.messages.value,
+        },
+        {
+          "icon": Icons.payment_outlined,
+          "text": "Payment Received",
+          "select": providerProfileController.payments.value,
+        },
+        {
+          "icon": Icons.star_border_outlined,
+          "text": "Customer Reviews",
+          "select": providerProfileController.customerReviews.value,
+        },
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +118,6 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                               notificationList[index]["icon"],
                               color: AppColor.primaryColor,
                             ),
-
                             title: Text(
                               notificationList[index]["text"],
                               style: const TextStyle(fontSize: 16),
@@ -144,16 +142,20 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                     // Update the controller values directly
                                     switch (index) {
                                       case 0: // Booking Requests
-                                        providerProfileController.bookingRequests.value = value;
+                                        providerProfileController
+                                            .bookingRequests.value = value;
                                         break;
-                                      case 1: // New Messages  
-                                        providerProfileController.messages.value = value;
+                                      case 1: // New Messages
+                                        providerProfileController
+                                            .messages.value = value;
                                         break;
                                       case 2: // Payment Received
-                                        providerProfileController.payments.value = value;
+                                        providerProfileController
+                                            .payments.value = value;
                                         break;
                                       case 3: // Customer Reviews
-                                        providerProfileController.customerReviews.value = value;
+                                        providerProfileController
+                                            .customerReviews.value = value;
                                         break;
                                     }
 
@@ -176,31 +178,40 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                               ),
                             ),
                             onTap: () {
-                              final currentValue = notificationList[index]["select"] as bool;
+                              final currentValue =
+                                  notificationList[index]["select"] as bool;
                               final newValue = !currentValue;
-                              
+
                               // Update the controller values directly
                               switch (index) {
                                 case 0: // Booking Requests
-                                  providerProfileController.bookingRequests.value = newValue;
+                                  providerProfileController
+                                      .bookingRequests.value = newValue;
                                   break;
-                                case 1: // New Messages  
-                                  providerProfileController.messages.value = newValue;
+                                case 1: // New Messages
+                                  providerProfileController.messages.value =
+                                      newValue;
                                   break;
                                 case 2: // Payment Received
-                                  providerProfileController.payments.value = newValue;
+                                  providerProfileController.payments.value =
+                                      newValue;
                                   break;
                                 case 3: // Customer Reviews
-                                  providerProfileController.customerReviews.value = newValue;
+                                  providerProfileController
+                                      .customerReviews.value = newValue;
                                   break;
                               }
 
                               // Call update with the new values
                               providerProfileController.updateNotifiPreference(
-                                bookingRequestsValue: providerProfileController.bookingRequests.value,
-                                messagesValue: providerProfileController.messages.value,
-                                paymentsValue: providerProfileController.payments.value,
-                                customerReviewsValue: providerProfileController.customerReviews.value,
+                                bookingRequestsValue: providerProfileController
+                                    .bookingRequests.value,
+                                messagesValue:
+                                    providerProfileController.messages.value,
+                                paymentsValue:
+                                    providerProfileController.payments.value,
+                                customerReviewsValue: providerProfileController
+                                    .customerReviews.value,
                               );
                             },
                           );

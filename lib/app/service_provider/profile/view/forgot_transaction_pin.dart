@@ -33,7 +33,6 @@ class ForgotTransactionPin extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               const TextWidget(
                 text:
                     'Please enter the email address linked to your account, and we’ll send you a confirmation email to reset your Transaction PIN.',
@@ -51,7 +50,7 @@ class ForgotTransactionPin extends StatelessWidget {
               const SizedBox(
                 height: 4,
               ),
-              CustomFormField(hintText: "Enter Email or Phone number"),
+              const CustomFormField(hintText: "Enter Email or Phone number"),
               const SizedBox(
                 height: 40,
               ),

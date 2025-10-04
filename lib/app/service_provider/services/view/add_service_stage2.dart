@@ -25,7 +25,7 @@ class _AddServiceStage2State extends State<AddServiceStage2> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      ()=> Scaffold(
+      () => Scaffold(
         backgroundColor: AppColor.whiteColor,
         appBar: AppBar(
           leading: InkWell(
@@ -170,8 +170,10 @@ class _AddServiceStage2State extends State<AddServiceStage2> {
                             hintText: "Enter price per service (N)",
                             controller: moneyController.hourlyRateController,
                             keyboardType: TextInputType.number,
-                            onChanged: (value) => moneyController.onValueChanged(
-                                moneyController.hourlyRateController, value),
+                            onChanged: (value) =>
+                                moneyController.onValueChanged(
+                                    moneyController.hourlyRateController,
+                                    value),
                           ),
                           const Wrap(
                             children: [
@@ -209,34 +211,36 @@ class _AddServiceStage2State extends State<AddServiceStage2> {
                         borderColor: AppColor.primaryColor,
                       ),
                     ),
-                    const SizedBox(width: 16,),
-
+                    const SizedBox(
+                      width: 16,
+                    ),
                     Expanded(
                       child: AppPrimaryButton(
                         buttonText: "Next",
-                        buttonColor:
-                            moneyController.servicePricecontroller.text.isNotEmpty
-                                ? AppColor.primaryColor
-                                : AppColor.primaryColor.shade200,
+                        buttonColor: moneyController
+                                .servicePricecontroller.text.isNotEmpty
+                            ? AppColor.primaryColor
+                            : AppColor.primaryColor.shade200,
                         onPressed: moneyController
                                 .servicePricecontroller.text.isNotEmpty
                             ? () {
                                 servicesController.servicePriceAmount.value =
-                                    moneyController.parseMoneyToInt(moneyController
-                                        .servicePricecontroller.text);
+                                    moneyController.parseMoneyToInt(
+                                        moneyController
+                                            .servicePricecontroller.text);
                                 if (moneyController
                                     .hourlyRateController.text.isNotEmpty) {
                                   servicesController.hourlyRateAmount.value =
                                       moneyController.parseMoneyToInt(
                                           moneyController
                                               .hourlyRateController.text);
-                                  print(
+                                  debugPrint(
                                       "------------- ${servicesController.hourlyRateAmount}");
                                 }
-                            
-                                print(
+
+                                debugPrint(
                                     "------------- ${servicesController.servicePriceAmount}");
-                            
+
                                 Get.to(() => const AddServiceStage3());
                               }
                             : () {},

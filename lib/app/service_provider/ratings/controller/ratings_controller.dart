@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../data/remote_services/remote_services.dart';
 
@@ -20,7 +21,7 @@ class RatingsController extends GetxController {
 
   Future<void> fetchRatingsAndReviews() async {
     isLoading(true);
-    print("heyyyyyyyy fetch transaction");
+    debugPrint("heyyyyyyyy fetch transaction");
     // SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // // Check if services exist in local storage
@@ -33,7 +34,8 @@ class RatingsController extends GetxController {
     // Fetch new services from API
     final response = await RemoteServices().getRatingsAndReviews();
     // print("@@@@@@@@@@ ${response} @@@@@@@@@@");
-    print("@@@@@@@@@@ ${response["averageRating"].runtimeType} @@@@@@@@@@");
+    debugPrint(
+        "@@@@@@@@@@ ${response["averageRating"].runtimeType} @@@@@@@@@@");
     isLoading(false);
 
     if (response is Map<String, dynamic>) {

@@ -13,8 +13,8 @@ import '../widget/add_service_dialog.dart';
 
 class ServicesController extends GetxController {
   final isLoading = false.obs;
-  RxList<dynamic> categories = <dynamic>[].obs; 
-  RxList<dynamic> providerServices = <dynamic>[].obs; 
+  RxList<dynamic> categories = <dynamic>[].obs;
+  RxList<dynamic> providerServices = <dynamic>[].obs;
 
   final serviceNameController = TextEditingController();
   RxString serviceCategory = ''.obs;
@@ -31,7 +31,7 @@ class ServicesController extends GetxController {
   final onsiteService = false.obs;
   final inStoreService = false.obs;
   final streetNumNameController = TextEditingController();
-  final cityController = TextEditingController(); 
+  final cityController = TextEditingController();
 
   final postalCodeController = TextEditingController();
 
@@ -41,7 +41,7 @@ class ServicesController extends GetxController {
   Map<String, dynamic> serviceAddress = {
     "street": "Remote Service",
     "city": "Remote Service",
-    "state": "Remote Service", 
+    "state": "Remote Service",
     "country": "Remote Service"
   };
 
@@ -68,20 +68,21 @@ class ServicesController extends GetxController {
   }
 
   Future<void> fetchAllCategories() async {
-    // print("heyyyyyyyy fetch Categories");
-   prefs = await SharedPreferences.getInstance();
+    // debugPrint("heyyyyyyyy fetch Categories");
+    prefs = await SharedPreferences.getInstance();
 
     // Check if services exist in local storage
     String? savedCategories = prefs.getString("cached_categories_list");
     if (savedCategories != null) {
-      categories.value = List<dynamic>.from(json.decode(savedCategories)).toList();
+      categories.value =
+          List<dynamic>.from(json.decode(savedCategories)).toList();
       serviceCategory.value = categories[0]["categoryName"];
       serviceCategoryId.value = categories[0]["_id"];
     }
 
     // Fetch new services from API
     final response = await RemoteServices().getAllCategories();
-    print("###### ${response} ######");
+    debugPrint("###### $response ######");
 
     if (response is List) {
       categories.value = response;
@@ -91,23 +92,25 @@ class ServicesController extends GetxController {
     }
   }
 
-    Future<void> fetchProviderServices() async {
-    print("heyyyyyyyy fetch provider Services");
+  Future<void> fetchProviderServices() async {
+    debugPrint("heyyyyyyyy fetch provider Services");
     prefs = await SharedPreferences.getInstance();
 
     // Check if services exist in local storage
     String? savedProviderServices = prefs.getString("cached_provider_services");
     if (savedProviderServices != null) {
-      providerServices.value = List<dynamic>.from(json.decode(savedProviderServices)).toList();
+      providerServices.value =
+          List<dynamic>.from(json.decode(savedProviderServices)).toList();
     }
 
     // Fetch new services from API
     final response = await RemoteServices().getProvderServices();
-    print("###### $response ######");
+    debugPrint("###### $response ######");
 
     if (response is Map<String, dynamic>) {
       providerServices.value = response["data"];
-      await prefs.setString("cached_provider_services", json.encode(response["data"]));
+      await prefs.setString(
+          "cached_provider_services", json.encode(response["data"]));
     }
   }
 
@@ -143,7 +146,7 @@ class ServicesController extends GetxController {
       // ✅ Check if widget is still mounted before using BuildContext
       if (context.mounted) {
         final dynamic responseData = response.data;
-        print("Response Data: $responseData");
+        debugPrint("Response Data: $responseData");
         serviceImages.clear();
         serviceNameController.clear();
         this.serviceCategory.value = '';
@@ -157,13 +160,13 @@ class ServicesController extends GetxController {
       }
       // }
     } else {
-      print(response.errorMessage);
+      debugPrint(response.errorMessage);
       const errorMessage = "An error occurred";
       customSnackbar("ERROR".tr, errorMessage, AppColor.error);
     }
   }
 
-    updateServices({
+  updateServices({
     required List<File?>? images,
     required String serviceName,
     required String serviceCategory,
@@ -195,7 +198,7 @@ class ServicesController extends GetxController {
       // ✅ Check if widget is still mounted before using BuildContext
       if (context.mounted) {
         final dynamic responseData = response.data;
-        print("Response Data: $responseData");
+        debugPrint("Response Data: $responseData");
         serviceImages.clear();
         serviceNameController.clear();
         this.serviceCategory.value = '';
@@ -209,13 +212,13 @@ class ServicesController extends GetxController {
       }
       // }
     } else {
-      print(response.errorMessage);
+      debugPrint(response.errorMessage);
       const errorMessage = "An error occurred";
       customSnackbar("ERROR".tr, errorMessage, AppColor.error);
     }
   }
 
-    deleteService(
+  deleteService(
     String serviceId,
   ) async {
     isLoading(true);
@@ -228,7 +231,7 @@ class ServicesController extends GetxController {
       // ✅ Extracting data from the response
       final dynamic responseData = response.data;
 
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       Get.snackbar(
         "Success".tr,
         "Service deleted successfully",
@@ -237,7 +240,7 @@ class ServicesController extends GetxController {
 
       update();
     } else {
-      print("--------- $response");
+      debugPrint("--------- $response");
 
       isLoading(false);
       final errorMessage = response.errorMessage ?? "An error occurred";

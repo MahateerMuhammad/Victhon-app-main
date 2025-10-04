@@ -110,8 +110,7 @@ class _AddServiceStage1State extends State<AddServiceStage1> {
                 const SizedBox(
                   height: 8,
                 ),
-                CategoriesDropdown(
-                ),
+                CategoriesDropdown(),
                 const SizedBox(
                   height: 24,
                 ),
@@ -167,13 +166,13 @@ class _AddServiceStage1State extends State<AddServiceStage1> {
                       child: AppOutlinedButton(
                         buttonText: "Cancel",
                         onPressed: () {},
-                      
                         textColor: AppColor.primaryColor,
                         borderColor: AppColor.primaryColor,
                       ),
                     ),
-                        const SizedBox(width: 16,),
-
+                    const SizedBox(
+                      width: 16,
+                    ),
                     Expanded(
                       child: AppPrimaryButton(
                         buttonText: "Next",
@@ -182,11 +181,10 @@ class _AddServiceStage1State extends State<AddServiceStage1> {
                             : AppColor.primaryColor.shade200,
                         onPressed: servicesController.isFormFilled.value
                             ? () {
-                              servicesController.isFormFilled.value = false;
-                                Get.to(() => AddServiceStage2());
+                                servicesController.isFormFilled.value = false;
+                                Get.to(() => const AddServiceStage2());
                               }
                             : () {},
-                      
                       ),
                     ),
                   ],

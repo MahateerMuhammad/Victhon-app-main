@@ -35,7 +35,7 @@ class RatingsView extends StatelessWidget {
           centerTitle: true,
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -63,7 +63,7 @@ class RatingsView extends StatelessWidget {
               //     } else {
               //       return
               Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: AppColor.primaryColor.shade50,
@@ -139,7 +139,7 @@ class RatingsView extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              SizedBox(width: 8),
+                              const SizedBox(width: 8),
                               TextWidget(text: "${data["count"]}"),
                             ],
                           ),
@@ -153,7 +153,7 @@ class RatingsView extends StatelessWidget {
               //   }
               // }),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // All Reviews Section
               Row(
@@ -167,7 +167,7 @@ class RatingsView extends StatelessWidget {
                   reviewsController.reviewsDetails.length > 3
                       ? TextButton(
                           onPressed: () {
-                            Get.to(() => ReviewsScreen());
+                            Get.to(() => const ReviewsScreen());
                           },
                           child: Row(
                             children: [
@@ -201,8 +201,8 @@ class RatingsView extends StatelessWidget {
                     return Column(
                       children: reviewsController.reviewsDetails.map((review) {
                         return Container(
-                          margin: EdgeInsets.only(bottom: 12),
-                          padding: EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: AppColor.primaryCardColor,
                             borderRadius: BorderRadius.circular(12),

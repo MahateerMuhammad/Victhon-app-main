@@ -23,7 +23,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
       backgroundColor: AppColor.whiteColor,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: const TextWidget(
@@ -50,8 +50,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                 return Column(
                   children: reviewsController.reviewsDetails.map((review) {
                     return Container(
-                      margin: EdgeInsets.only(bottom: 12),
-                      padding: EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: AppColor.primaryCardColor,
                         borderRadius: BorderRadius.circular(12),
