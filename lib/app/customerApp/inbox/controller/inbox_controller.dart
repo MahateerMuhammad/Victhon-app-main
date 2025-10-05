@@ -64,8 +64,22 @@ class InboxController extends GetxController {
 
   addMessage(messageList) {
     print("get hereeeee");
-    customerMessages.add(messageList);
-    print("messages: $customerMessages");
+    
+    // Check for duplicates before adding
+    bool exists = customerMessages.any((m) => 
+      m["content"] == messageList["content"] && 
+      m["createdAt"] == messageList["createdAt"] &&
+      m["isCurrentUser"] == messageList["isCurrentUser"]
+    );
+    
+    if (!exists) {
+      customerMessages.add(messageList);
+      print("New message added: $messageList");
+    } else {
+      print("Duplicate message ignored: $messageList");
+    }
+    
+    print("Total messages: ${customerMessages.length}");
   }
 
   void refreshConversationsOnly() {
@@ -131,7 +145,8 @@ class InboxController extends GetxController {
     String content,
   ) async {
     try {
-      // Send message via HTTP API to persist to database
+      // Only send message via HTTP API to persist to database
+      // The backend should handle real-time notifications via socket
       final response = await RemoteServices().sendMessage(
         receiverId: receiverId,
         content: content,
@@ -139,24 +154,8 @@ class InboxController extends GetxController {
       
       print("Send message response: $response");
       
-      // Also emit via socket for real-time messaging
-      socket.emitWithAck(
-        "directMessage",
-        {
-          "receiverId": receiverId,
-          "content": content,
-        },
-        ack: (dynamic data) {
-          if (data != null) {
-            print("Socket ack received: $data");
-          } else {
-            print("No socket ack received");
-          }
-        },
-      );
-      
-      // Don't automatically refresh conversations here as it interferes with chat screen
-      // Only refresh when explicitly needed (like when going back to inbox)
+      // Remove socket emission to prevent duplicates
+      // The backend will handle real-time updates via socket
       
     } catch (e) {
       print("Error sending message: $e");

@@ -56,27 +56,43 @@ class MessageController extends GetxController {
   }
 
   addMessage(messageList) {
-    messages.add(messageList);
+    // Check for duplicates before adding
+    bool exists = messages.any((m) => 
+      m["content"] == messageList["content"] && 
+      m["createdAt"] == messageList["createdAt"] &&
+      m["isCurrentUser"] == messageList["isCurrentUser"]
+    );
+    
+    if (!exists) {
+      messages.add(messageList);
+      print("Provider: New message added: $messageList");
+    } else {
+      print("Provider: Duplicate message ignored: $messageList");
+    }
+    
+    print("Provider total messages: ${messages.length}");
   }
 
-  sendMessage(
+  Future<void> sendMessage(
     String receiverId,
     String content,
-  ) {
-    socket.emitWithAck(
-      "directMessage",
-      {
-        "receiverId": receiverId,
-        "content": content,
-      },
-      ack: (dynamic data) {
-        if (data != null) {
-          print("Ack received: $data");
-        } else {
-          print("No ack received");
-        }
-      },
-    );
+  ) async {
+    try {
+      // Use HTTP API to persist message to database
+      // The backend should handle real-time notifications via socket
+      final response = await RemoteServices().sendMessage(
+        receiverId: receiverId,
+        content: content,
+      );
+      
+      print("Provider send message response: $response");
+      
+      // Remove socket emission to prevent duplicates
+      // The backend will handle real-time updates via socket
+      
+    } catch (e) {
+      print("Error sending message from provider: $e");
+    }
   }
 
       Future<String> uploadImage({

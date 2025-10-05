@@ -9,6 +9,7 @@ import 'package:Victhon/utils/functions.dart';
 import 'package:Victhon/widget/textwidget.dart';
 
 import '../../../../data/remote_services/network_service.dart';
+import '../../../../data/remote_services/remote_services.dart';
 import '../../../../widget/chat_icon_widget.dart';
 import '../controller/message_controller.dart';
 
@@ -36,6 +37,35 @@ class _ServiceProviderChatScreenState extends State<ServiceProviderChatScreen> {
   final DateTime now = DateTime.now();
   String messageText = '';
   bool addButtonTap = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load messages if we have an existing conversation
+    if (widget.message != null && widget.message["_id"] != null) {
+      debugPrint("Loading messages for existing conversation: ${widget.message["_id"]}");
+      _loadConversationMessages(widget.message["_id"]);
+    } else {
+      // Clear messages for new conversation
+      messageController.messages.clear();
+    }
+  }
+
+  Future<void> _loadConversationMessages(String conversationId) async {
+    try {
+      messageController.messages.clear();
+      
+      final response = await RemoteServices().getConversationMessages(conversationId);
+      
+      if (response is Map<String, dynamic> && response["messages"] != null) {
+        List<dynamic> messages = response["messages"];
+        messageController.messages.assignAll(messages);
+        print("Provider loaded ${messages.length} messages for conversation $conversationId");
+      }
+    } catch (e) {
+      print("Error loading conversation messages in provider: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,6 +195,7 @@ class _ServiceProviderChatScreenState extends State<ServiceProviderChatScreen> {
                                 isSender: isSender,
                               );
                       }
+                      return const SizedBox.shrink(); // Return empty widget if content is empty
                     },
                   ),
                   Obx(() {
@@ -253,26 +284,28 @@ class _ServiceProviderChatScreenState extends State<ServiceProviderChatScreen> {
                       ),
                       messageText.isNotEmpty
                           ? InkWell(
-                              onTap: () {
+                              onTap: () async {
                                 if (messageText.trim().isNotEmpty) {
-                                  messageController.sendMessage(
-                                    // widget.isNewChat
-                                    //     ? widget.customerDetails["_id"]
-                                    //     :
-                                    widget.message["otherUser"]["userId"],
-                                    messageText,
-                                  );
+                                  // Add message to UI immediately for better UX
                                   messageController.addMessage({
                                     "content": messageText,
                                     "isCurrentUser": true,
                                     "createdAt": now.toIso8601String(),
                                   });
-                                  print(
-                                      "_________________ ${messageController.messages}");
+
+                                  String currentMessage = messageText;
                                   messageController.messageController.clear();
                                   setState(() {
                                     messageText = '';
                                   });
+
+                                  // Send message to backend
+                                  await messageController.sendMessage(
+                                    widget.message["otherUser"]["userId"],
+                                    currentMessage,
+                                  );
+                                  
+                                  print("_________________ ${messageController.messages}");
                                 }
                               },
                               child: const CircleAvatar(
