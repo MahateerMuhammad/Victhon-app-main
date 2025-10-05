@@ -641,12 +641,12 @@ class RemoteServices {
       endPoint: ApiList.createNotifiPreference,
       headers: AppServer.getHttpHeadersWithToken(),
       body: {
-        "bookingRequests": true,
-        "messages": true,
-        "payments": true,
-        "customerReviews": true,
-        "emailNotifications": true,
-        "smsNotifications": true,
+        "bookingRequests": false,
+        "newMessages": false,  // Backend expects 'newMessages'
+        "paymentReceived": false,  // Backend expects 'paymentReceived'
+        "customerReviews": false,
+        "emailNotifications": false,
+        "smsNotifications": false,
       },
     );
 
@@ -663,9 +663,16 @@ class RemoteServices {
       final data = response.data;
       debugPrint("object 222222222 $data");
 
+      // Check if backend is returning defaults (no actual preferences exist)
+      if (data is Map && data["message"] != null && 
+          data["message"].toString().contains("No preferences found")) {
+        debugPrint("Backend returned defaults, not actual preferences");
+        return null; // Indicates preferences don't actually exist
+      }
+
       return data;
     } else {
-      return response;
+      return null; // Indicates preferences don't exist or error occurred
     }
   }
 
@@ -680,8 +687,8 @@ class RemoteServices {
       headers: AppServer.getHttpHeadersWithToken(),
       body: {
         "bookingRequests": bookingRequests,
-        "messages": messages,
-        "payments": payments,
+        "newMessages": messages,  // Backend expects 'newMessages'
+        "paymentReceived": payments,  // Backend expects 'paymentReceived'
         "customerReviews": customerReviews,
         "emailNotifications": true,
         "smsNotifications": false,

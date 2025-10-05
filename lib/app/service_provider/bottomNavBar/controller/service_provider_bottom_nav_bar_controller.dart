@@ -41,10 +41,19 @@ class ServiceProviderBottomNavBarController extends GetxController {
       // ✅ Extracting data from the response
 
       final dynamic responseData = response.data;
-      final ApiResponse notifiResponse =
-          await RemoteServices().createNotifiPreference();
-      if (notifiResponse.isSuccess) {
-        debugPrint("✅ Notification set : ${notifiResponse.data}");
+      
+      // Check if notification preferences exist first
+      final getNotifiResponse = await RemoteServices().getNotifiPreference();
+      if (getNotifiResponse == null) {
+        // Preferences don't exist, create them with default false values
+        final notifiResponse = await RemoteServices().createNotifiPreference();
+        if (notifiResponse != null) {
+          debugPrint("✅ Provider notification preferences created with default false values");
+        } else {
+          debugPrint("❌ Failed to create provider notification preferences");
+        }
+      } else {
+        debugPrint("✅ Provider notification preferences already exist");
       }
 
       print("Response Data: $responseData");
